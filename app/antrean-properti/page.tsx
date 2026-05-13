@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from 'next/link';
 import { CircleUser, Search, CircleAlert, Clock, MapPin, ArrowRight, History, User } from 'lucide-react';
 
 export default function Home() {
@@ -185,7 +186,7 @@ export default function Home() {
       </div>
       {/* Footer */}
       <footer className="w-full max-w-md bg-[#EEEDF4] border-t border-[#C5C5D3] flex justify-around items-center py-2 mt-10 fixed bottom-0 left-0 z-50 left-1/2 -translate-x-1/2">
-        <div className="bg-[#1E3A8A] rounded-lg flex flex-col justify-center items-center font-bold text-[12px] text-[#90A8FF] py-1 px-4 shrink-0 ">
+        <Link href="/antrean-properti" className="bg-[#1E3A8A] rounded-lg flex flex-col justify-center items-center font-bold text-[12px] text-[#90A8FF] py-1 px-4 shrink-0 ">
             <Image
                 src="/images/common/navbar-queue.svg"
                 alt="Logo Navbar Antrian"
@@ -194,15 +195,15 @@ export default function Home() {
                 className="shrink-0 mb-1"
             />
             Queue
-        </div>
-        <div className="flex flex-col justify-center items-center font-bold text-[12px] text-[#444651] py-1 px-4 shrink-0">
+        </Link>
+        <Link href="/riwayat-keputusan" className="flex flex-col justify-center items-center font-bold text-[12px] text-[#444651] py-1 px-4 shrink-0">
             <History className="size-5 text-[#444651] mb-1"/>
             History
-        </div>
-        <div className="flex flex-col justify-center items-center font-bold text-[12px] text-[#444651] py-1 px-4">
+        </Link>
+        <Link href="/profile" className="flex flex-col justify-center items-center font-bold text-[12px] text-[#444651] py-1 px-4 shrink-0">
             <User className="size-5 text-[#444651] mb-1"/>
             Profile
-        </div>
+        </Link>
       </footer>
     </main>
   );
