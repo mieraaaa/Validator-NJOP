@@ -6,13 +6,13 @@ export default function Home() {
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-hidden bg-[#FAF8FF]">
 
       {/* Header */}
-      <header className="bg-[#FAF8FF] w-full h-[73px] sticky top-0 flex justify-end items-center border border-[#C5C5D3] shadow-md">
+      <header className="bg-[#FAF8FF] w-full h-[73px] sticky top-0 flex justify-end items-center border-b border-[#C5C5D3] shadow-xs px-5">
         <h1 className="text-[#00236F] font-bold font-mono text-[24px] absolute left-1/2 -translate-x-1/2">ValidatorNJOP</h1>
-        <CircleUser className="flex size-5 text-[#1A1B21] mr-5"/>
+        <CircleUser className="flex size-5 text-[#1A1B21]"/>
       </header>
 
       {/* Content */}
-      <div className="bg-white border-2 border-[#C5C5D3] rounded-sm mt-20 w-[93%] mx-auto pb-10">
+      <div className="bg-white border-2 border-[#C5C5D3] rounded-sm mt-20 w-[93%] mx-auto pb-10 shadow-md">
         <Image
           src="/images/login-page/logo.svg"
           alt="Logo ValidatorNJOP"
