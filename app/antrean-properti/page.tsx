@@ -37,7 +37,7 @@ export default function Home() {
         {/* Search Bar */}
         <div className="w-full bg-white border-2 border-[#C5C5D3] rounded-md mt-5 py-2 px-2 shadow-xs placeholder:text-[#6B7280] text-black flex items-center gap-2">
             <Search className="flex size-5 text-[#757682]"/>
-            <input id="search" type="text" name="search" 
+            <input id="search" type="search" name="search" 
                 placeholder="Cari NOP atau Alamat..."
                 className="w-full ml-1 outline-none focus:ring-0 font-public-sans text-[14px]"
             />
