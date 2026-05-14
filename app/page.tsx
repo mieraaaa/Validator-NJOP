@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from 'next/link';
 import { CircleUser, ArrowRight} from 'lucide-react';
 
 export default function Home() {
@@ -60,11 +61,11 @@ export default function Home() {
         </div>
         {/* Button 'Masuk Sekarang' */}
         <div className="w-[90%] mx-auto mt-6 flex">
-          <button type="submit"
+          <Link href="/antrean-properti"
             className="w-full bg-[#00236F] text-white text-[14px] font-bold py-3 rounded-md flex justify-center items-center gap-1">
             Masuk Sekarang
             <ArrowRight className="size-5 text-white"/>
-          </button>
+          </Link>
         </div>
 
         <hr className="w-[90%] mx-auto mt-10 text-[#C5C5D3]"></hr>
