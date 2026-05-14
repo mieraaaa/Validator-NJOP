@@ -84,7 +84,7 @@ export default function Home() {
         {/* Tombol Bawah */}
         <div className="w-full flex flex-col gap-4">
             {/* Preview Draf Berita Acara */}
-            <Link href="/berita-setuju" className="w-full border border-[#757682] rounded-lg flex justify-center items-center gap-2 text-[#1A1B21] py-3">
+            <Link href="/berita-tolak" className="w-full border border-[#757682] rounded-lg flex justify-center items-center gap-2 text-[#1A1B21] py-3">
                 <FileText className="flex size-5 shrink-0"/>
                 <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
             </Link>
