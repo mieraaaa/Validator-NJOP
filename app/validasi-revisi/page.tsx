@@ -4,7 +4,7 @@ import { CircleUser, ArrowLeft, CircleCheck, CircleX, FileText, PencilLine, Send
 
 export default function Home() {
   return (
-    <main className="w-full max-w-md mx-auto min-h-screen relative overflow-hidden bg-[#f8fafc]">
+    <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc]">
 
       {/* Header */}
       <header className="bg-[#FAF8FF] w-full h-[73px] sticky top-0 z-50 flex justify-end items-center border-b border-[#C5C5D3] shadow-xs px-5">
@@ -67,7 +67,7 @@ export default function Home() {
             </label>
             <div className="w-full bg-white border border-[#C5C5D3] rounded-sm flex justify-start gap-2 px-2 py-2">
                 <span className="font-mono font-medium text-[14px] text-[#444651]">Rp</span>
-                <input id="nominal" type="text" name="nominal" 
+                <input id="nominal" type="text" name="nominal" inputMode="numeric" 
                     placeholder="Masukkan nominal baru"
                 className="w-full ml-1 outline-none focus:ring-0 text-[12px] text-black placeholder:text-[#6B7280]"
                 />
