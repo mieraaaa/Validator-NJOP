@@ -4,7 +4,7 @@ import { CircleUser, Search, CircleAlert, Clock, MapPin, ArrowRight, History, Us
 
 export default function Home() {
   return (
-    <main className="w-full max-w-md mx-auto min-h-screen relative overflow-hidden bg-[#f8fafc] pb-20">
+    <main className="w-full max-w-md mx-auto min-h-screen relative flow-hiddenover bg-[#f8fafc] pb-20">
 
       {/* Header */}
       <header className="bg-[#FAF8FF] w-full h-[73px] sticky top-0 flex justify-end items-center border border-[#C5C5D3] shadow-xs">
