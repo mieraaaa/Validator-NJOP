@@ -52,34 +52,40 @@ export default function Home() {
                 </button>
             </div>
         </div>
-        {/* Rangkuman NOP */}
+        {/* Nilai NJOP Baru */}
+        <div className="w-full bg-[#F4F3FA] border-2 border-[#C5C5D3] rounded-md mt-5 py-4 px-4 shadow-xs flex flex-col gap-3 border-l-4 border-l-[#6e2c01]">
+            <label htmlFor="nominal" className="flex justify-start items-center gap-1">
+                <Image
+                    src="/images/validasi-revisi/logo-uang.svg"
+                    alt="Logo Uang"
+                    width={14}
+                    height={10}
+                    className="shrink-0"
+                />
+                <h4 className="font-bold text-[14px] text-[#1A1B21]">Nilai NJOP Baru (Penyesuaian)</h4>
+                <span className="font-mono font-bold text-[11px] text-[#BA1A1A]">*</span>
+            </label>
+            <div className="w-full bg-white border border-[#C5C5D3] rounded-sm flex justify-start gap-2 px-2 py-2">
+                <span className="font-mono font-medium text-[14px] text-[#444651]">Rp</span>
+                <input id="nominal" type="text" name="nominal" 
+                    placeholder="Masukkan nominal baru"
+                className="w-full ml-1 outline-none focus:ring-0 text-[12px] text-black placeholder:text-[#6B7280]"
+                />
+            </div>
+        </div>
+        {/* Alasan/Catatan Penilai */}
         <div className="w-full border-2 border-[#C5C5D3] rounded-md mt-5 py-4 px-4 shadow-xs flex flex-col gap-3">
-            <div className="flex justify-between">
-                <div className="flex flex-col gap-1 justify-start min-w-0">
-                    <h3 className="font-bold text-[14px] text-[#44474F]">NOMOR OBJEK PAJAK (NOP)</h3>
-                    <span className="font-bold text-[22px] text-[#00236F] break-words leading-tight">31.71.040.003.012-0051.0</span>
-                </div>
-                <FileText className="flex size-5 text-[#747780] shrink-0"/>
+            <div className="w-full flex justify-between">
+                <label htmlFor="alasan" className="flex justify-start items-center gap-1">
+                    <span className="font-bold text-[14px] text-[#1A1B21]">Alasan / Catatan Penilai</span>
+                    <span className="font-mono font-bold text-[11px] text-[#BA1A1A]">*</span>
+                </label>
+                <span className="text-[12px] text-[#444651]">Wajib Diisi</span>
             </div>
-            <hr className="border-[#C5C5D3] w-full mx-auto"/>
-            <div className="flex flex-col gap-1 justify-start">
-                <h3 className="font-bold text-[14px] text-[#44474F]">ALAMAT OBJEK PAJAK</h3>
-                <span className="text-[14px] text-[#1A1B21] leading-tight line-clamp-2">Jl. Kebon Kacang Raya No. 24, Jakarta Pusat</span>
-            </div>
-            <div className="bg-[#F4F3F8] rounded-sm flex justify-between items-start px-3 py-3">
-                <div className="flex flex-col gap-1 justify-start font-bold flex-1 min-w-0">
-                    <h4 className="text-[14px] text-[#44474F] leading-tight">NJOP yang Disetujui</h4>
-                    <span className="text-[22px] text-[#00236F] leading-tight tracking-tight">Rp 15.500.000 / 
-                        <span className="block"> m² </span>
-                    </span>
-                </div>
-                <div className="flex flex-col gap-1 text-right items-end font-bold flex-1 min-w-0">
-                    <h4 className="text-[14px] text-[#44474F] leading-tight">Total Nilai</h4>
-                    <span className="text-[22px] text-[#00236F] leading-tight tracking-tight">Rp 3,10 
-                        <span className="block">Miliar</span>
-                    </span>
-                </div>
-            </div>
+            <textarea rows={4} id="alasan" name="alasan"
+                className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
+                placeholder="Uraikan alasan revisi secara mendetail berdasarkan temuan lapangan..."
+            ></textarea>
         </div>
         {/* Tanda Tangan Digital */}
         <div className="w-full border-2 border-[#C5C5D3] rounded-md mt-5 py-4 px-4 shadow-xs flex flex-col gap-2">
