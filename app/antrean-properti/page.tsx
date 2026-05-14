@@ -9,7 +9,9 @@ export default function Home() {
       {/* Header */}
       <header className="bg-[#FAF8FF] w-full h-[73px] sticky top-0 flex justify-end items-center border border-[#C5C5D3] shadow-xs">
         <h1 className="text-[#00236F] font-bold font-mono text-[24px] absolute left-1/2 -translate-x-1/2">ValidatorNJOP</h1>
-        <CircleUser className="flex size-5 text-[#1A1B21] mr-5"/>
+        <Link href="/profile">
+            <CircleUser className="flex size-5 text-[#1A1B21] mr-5"/>
+        </Link>
       </header>
 
       {/* Content */}
@@ -92,9 +94,9 @@ export default function Home() {
                         2 Hari Lagi
                     </div>
                 </div>
-                <button type="button" className="shrink-0">
+                <Link href="/detail-properti" className="shrink-0">
                     <ArrowRight className="size-5 text-[#444651]"/>
-                </button>
+                </Link>
             </div>
         </div>
 
@@ -135,9 +137,9 @@ export default function Home() {
                         7 Hari Lagi
                     </div>
                 </div>
-                <button type="button" className="shrink-0">
+                <Link href="/detail-properti" className="shrink-0">
                     <ArrowRight className="size-5 text-[#444651]"/>
-                </button>
+                </Link>
             </div>
         </div>
 
@@ -178,9 +180,9 @@ export default function Home() {
                         7 Hari Lagi
                     </div>
                 </div>
-                <button type="button" className="shrink-0">
+                <Link href="/detail-properti" className="shrink-0">
                     <ArrowRight className="size-5 text-[#444651]"/>
-                </button>
+                </Link>
             </div>
         </div>
       </div>
