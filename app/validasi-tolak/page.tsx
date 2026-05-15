@@ -1,0 +1,110 @@
+import Image from "next/image";
+import Link from 'next/link';
+import { CircleUser, ArrowLeft, CircleCheck, CircleX, FileText, PencilLine, SendHorizontal } from 'lucide-react';
+
+export default function Home() {
+  return (
+    <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc]">
+
+      {/* Header */}
+      <header className="bg-[#FAF8FF] w-full h-[73px] sticky top-0 z-50 flex justify-end items-center border-b border-[#C5C5D3] shadow-xs px-5">
+        <h1 className="text-[#00236F] font-bold font-mono text-[24px] absolute left-1/2 -translate-x-1/2">ValidatorNJOP</h1>
+        <Link href="/profile">
+            <CircleUser className="flex size-5 text-[#1A1B21]"/>
+        </Link>
+      </header>
+
+      {/* Content */}
+      <div className="w-[93%] mx-auto mt-4">
+        <div className="w-full flex justify-start items-center gap-2">
+            <Link href="/detail-properti">
+                <ArrowLeft className="flex size-6 text-[#444651] shrink-0"/>
+            </Link>
+            <h2 className="font-mono font-bold text-[24px] text-[#1A1B21]">Validasi Keputusan</h2>
+        </div>
+        {/* Ringkasan Keputusan */}
+        <div className="w-full border-2 border-[#C5C5D3] rounded-md mt-5 py-4 px-4 shadow-xs">
+            <div className="flex flex-col gap-1 justify-start">
+                <h3 className="font-bold text-[16px] text-[#1A1B21]">Ringkasan Keputusan</h3>
+                <p className="text-[12px] text-[#444651]">Pilih tindak lanjut untuk berkas penilaian ini.</p>
+            </div>
+            <div className="w-full flex justify-between items-stretch gap-2 pt-4">
+                {/* Setujui */}
+                <button type="button" className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                    <CircleCheck className="flex size-5 text-[#1B6B51] shrink-0"/>
+                    <span className="font-bold text-[16px] text-[#444651]">Setujui</span>
+                </button>
+                {/* Revisi */}
+                <button type="button" className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                    <Image
+                        src="/images/common/logo-revisi.svg"
+                        alt="Logo Revisi"
+                        width={18}
+                        height={16}
+                        className="shrink-0"
+                    />
+                    <span className="font-bold text-[16px] text-[#444651]">Revisi</span>
+                </button>
+                {/* Tolak */}
+                <button type="button" className="flex-1 border-2 border-[#A31708] bg-[#FFDAD6] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                    <CircleX className="flex size-5 text-[#BA1A1A] shrink-0"/>
+                    <span className="font-bold text-[16px] text-[#341100]">Tolak</span>
+                </button>
+            </div>
+        </div>
+        {/* Alasan Penolakan */}
+        <div className="w-full border-2 border-[#C5C5D3] rounded-md mt-5 py-4 px-4 shadow-xs flex flex-col gap-3">
+            <div className="w-full flex justify-between">
+                <label htmlFor="alasan" className="flex justify-start items-center gap-1">
+                    <span className="font-bold text-[14px] text-[#1A1B21]">Alasan Penolakan</span>
+                    <span className="font-mono font-bold text-[11px] text-[#BA1A1A]">*</span>
+                </label>
+                <span className="text-[12px] text-[#444651]">Wajib Diisi</span>
+            </div>
+            <textarea rows={4} id="alasan" name="alasan"
+                className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
+                placeholder="Uraikan alasan penolakan secara mendetail berdasarkan peraturan atau temuan lapangan yang berlaku..."
+            ></textarea>
+        </div>
+        {/* Tindakan Lanjutan */}
+        <div className="w-full border-2 border-[#C5C5D3] rounded-md mt-5 py-4 px-4 shadow-xs flex flex-col gap-3">
+            <div className="w-full flex justify-between">
+                <label htmlFor="tindakan" className="flex justify-start items-center gap-1">
+                    <span className="font-bold text-[14px] text-[#1A1B21]">Tindakan Lanjutan</span>
+                    <span className="font-mono font-bold text-[11px] text-[#BA1A1A]">*</span>
+                </label>
+                <span className="text-[12px] text-[#444651]">Wajib Diisi</span>
+            </div>
+            <textarea rows={3} id="tindakan" name="tindakan"
+                className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
+                placeholder="Uraikan langkah perbaikan atau instruksi selanjutnya untuk pemohon..."
+            ></textarea>
+        </div>
+        <hr className="border-[#C5C5D3] w-full mx-auto mt-8 mb-4"/>
+        {/* Tombol Bawah */}
+        <div className="w-full flex flex-col gap-4">
+            {/* Preview Draf Berita Acara */}
+            <Link href="/berita-tolak" className="w-full border border-[#757682] rounded-lg flex justify-center items-center gap-2 text-[#1A1B21] py-3">
+                <FileText className="flex size-5 shrink-0"/>
+                <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
+            </Link>
+            {/* Konfirmasi & Kirim */}
+            <Link href="/validasi-berhasil" className="w-full bg-[#1E3A8A] rounded-lg flex justify-center items-center gap-2 text-[#90A8FF] py-3">
+                <span className="font-mono font-semibold text-[16px]">Konfirmasi & Kirim</span>
+                <SendHorizontal className="flex size-5 shrink-0"/>
+            </Link>
+        </div>
+        <div className="w-full bg-[#EEEDF4] rounded-sm flex justify-between items-start text-start gap-2 my-5 px-3 py-3">
+            <Image
+                src="/images/common/logo-palu.svg"
+                alt="Logo Palu"
+                width={13}
+                height={16}
+                className="shrink-0"           
+            />
+            <p className="font-public-sans text-[12px] text-[#444651]">Keputusan ini bersifat final dan akan tercatat secara permanen dalam audit trail sistem pemerintahan. Pastikan semua data akurat sebelum mengirim.</p>
+        </div>
+      </div>
+    </main>
+  );
+}
