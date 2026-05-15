@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from 'next/link';
-import { History, User, CircleCheck, BadgeCheck, ReceiptText } from 'lucide-react';
+import { History, User, CircleCheck, ReceiptText } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -26,9 +26,15 @@ export default function Home() {
             <hr className="border-[#C5C5D3] w-full mx-auto border-t"/>
             <div className="flex flex-row justify-between items-center gap-5">
                 <h2 className="font-mono font-bold text-[11px] text-[#444651]">STATUS VALIDASI</h2>
-                <div className="rounded-xl bg-[#D1FAE5] border border-[#E2E8F0] text-[#065F46] flex justify-center items-center gap-1 px-2 py-1">
-                    <BadgeCheck className="flex size-3 shrink-0"/>
-                    <span className="font-public-sans font-medium text-[12px]">Setujui</span>
+                <div className="rounded-xl bg-[#F9FE94] border border-[#E2E8F0] text-[#341100] flex justify-center items-center gap-1 px-2 py-1">
+                    <Image
+                        src="/images/common/logo-revisi.svg"
+                        alt="Logo Revisi"
+                        width={10}
+                        height={9}
+                        className="shrink-0"        
+                    />
+                    <span className="font-public-sans font-medium text-[12px]">Revisi</span>
                 </div>
             </div>
         </div>
@@ -37,7 +43,7 @@ export default function Home() {
             <Link href="/antrean-properti" className="bg-[#1E3A8A] rounded-sm flex justify-center items-center w-full py-3">
                 <span className="font-bold text-white text-[16px]">Kembali ke Antrean</span>
             </Link>
-            <Link href="/berita-setuju" className="border border-[#00236F] text-[#00236F] rounded-sm flex flex-row gap-1 justify-center items-center w-full py-3">
+            <Link href="/berita-revisi-ttd" className="border border-[#00236F] text-[#00236F] rounded-sm flex flex-row gap-1 justify-center items-center w-full py-3">
                 <ReceiptText className="w-[18px] h-[20px]"/>
                 <span className="font-bold text-[16px]">Lihat Dokumen Ditandatangani</span>
             </Link>

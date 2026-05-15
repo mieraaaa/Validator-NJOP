@@ -110,7 +110,7 @@ export default function Home() {
                 <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
             </Link>
             {/* Konfirmasi & Kirim */}
-            <Link href="/validasi-berhasil" className="w-full bg-[#1E3A8A] rounded-lg flex justify-center items-center gap-2 text-[#90A8FF] py-3">
+            <Link href="/validasi-berhasil-setuju" className="w-full bg-[#1E3A8A] rounded-lg flex justify-center items-center gap-2 text-[#90A8FF] py-3">
                 <span className="font-mono font-semibold text-[16px]">Konfirmasi & Kirim</span>
                 <SendHorizontal className="flex size-6 shrink-0"/>
             </Link>
