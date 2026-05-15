@@ -90,7 +90,7 @@ export default function Home() {
                 />
                 <hr className="border-[#444651] w-[70%] mx-auto border-t pb-1"/>
                 <span className="font-mono font-semibold text-[16px]">Budi Santoso, S.IP</span>
-                <span className="font-mono font-medium text-[14px] text-[#444651]">NIP. 198012012005011002</span>
+                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">NIP. 198012012005011002</span>
             </div>
             <div className="flex flex-col items-center px-2 flex-1 min-w-0">
                 <h5 className="font-public-sans text-[12px] min-h-[36px] leading-tight">Petugas, Penilai Pajak Lapangan</h5>
@@ -103,7 +103,7 @@ export default function Home() {
                 />
                 <hr className="border-[#444651] w-[70%] mx-auto border-t pb-1"/>
                 <span className="font-mono font-semibold text-[16px]">Ahmad Hidayat</span>
-                <span className="font-mono font-medium text-[14px] text-[#444651]">NIP. 199203152019021001</span>
+                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">NIP. 199203152019021001</span>
             </div>
         </div>
       </div>
