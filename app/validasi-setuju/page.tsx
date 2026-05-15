@@ -112,7 +112,7 @@ export default function Home() {
             {/* Konfirmasi & Kirim */}
             <Link href="/validasi-berhasil" className="w-full bg-[#1E3A8A] rounded-lg flex justify-center items-center gap-2 text-[#90A8FF] py-3">
                 <span className="font-mono font-semibold text-[16px]">Konfirmasi & Kirim</span>
-                <SendHorizontal className="flex size-5 shrink-0"/>
+                <SendHorizontal className="flex size-6 shrink-0"/>
             </Link>
         </div>
         <div className="w-full bg-[#EEEDF4] rounded-sm flex justify-between items-start text-start gap-2 my-5 px-3 py-3">
