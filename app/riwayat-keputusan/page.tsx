@@ -46,7 +46,7 @@ export default function Home() {
         {/* List Properti */}
         <div className="w-full flex flex-col gap-3">
             {/* Card 1 */}
-            <Link href="/berita-setuju" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
+            <Link href="/berita-setuju-ttd" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
                 <div className="w-full flex flex-row justify-between items-start">
                     <div className="flex flex-col gap-2">
                         <div className="font-mono flex flex-col gap-1">
@@ -72,7 +72,7 @@ export default function Home() {
                 </div>
             </Link>
             {/* Card 2 */}
-            <Link href="/berita-revisi" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
+            <Link href="/berita-revisi-ttd" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
                 <div className="w-full flex flex-row justify-between items-start">
                     <div className="flex flex-col gap-2">
                         <div className="font-mono flex flex-col gap-1">
@@ -104,7 +104,7 @@ export default function Home() {
                 </div>
             </Link>
             {/* Card 3 */}
-            <Link href="/berita-tolak" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
+            <Link href="/berita-tolak-ttd" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
                 <div className="w-full flex flex-row justify-between items-start">
                     <div className="flex flex-col gap-2">
                         <div className="font-mono flex flex-col gap-1">
@@ -133,7 +133,7 @@ export default function Home() {
     </div>
 
       {/* Footer */}
-      <footer className="w-full max-w-md bg-[#EEEDF4] border-t border-[#C5C5D3] flex justify-around items-center py-2 mt-10 fixed bottom-0 left-0 z-50 left-1/2 -translate-x-1/2">
+      <footer className="w-full max-w-md bg-[#EEEDF4] border-t border-[#C5C5D3] flex justify-around items-center py-2 fixed bottom-0 z-50 left-1/2 -translate-x-1/2">
         <Link href="/antrean-properti" className="flex flex-col justify-center items-center font-bold text-[12px] text-[#444651] py-1 px-4 shrink-0 ">
             <Image
                 src="/images/riwayat-keputusan/navbar-queue.svg"
