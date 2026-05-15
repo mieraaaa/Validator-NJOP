@@ -153,7 +153,7 @@ export default function Home() {
       
 
       {/* Footer */}
-      <footer className="w-full max-w-md bg-[#EEEDF4] border-t border-[#C5C5D3] flex justify-around items-center py-4 mt-10 fixed bottom-0 z-50 left-1/2 -translate-x-1/2">
+      <footer className="w-full max-w-md bg-[#EEEDF4] border-t border-[#C5C5D3] flex justify-around items-center py-4 fixed bottom-0 z-50 left-1/2 -translate-x-1/2">
         <Link href="/validasi-setuju"
             className="bg-[#00236F] rounded-sm flex justify-center items-center gap-1 font-bold text-[16px] text-white py-3 w-[92%] shrink-0 ">
             Lanjutkan ke Keputusan
