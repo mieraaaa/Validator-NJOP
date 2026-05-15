@@ -46,7 +46,7 @@ export default function Home() {
         {/* List Properti */}
         <div className="w-full flex flex-col gap-3">
             {/* Card 1 */}
-            <Link href="/berita-setuju" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
+            <Link href="/berita-setuju-ttd" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
                 <div className="w-full flex flex-row justify-between items-start">
                     <div className="flex flex-col gap-2">
                         <div className="font-mono flex flex-col gap-1">
@@ -72,7 +72,7 @@ export default function Home() {
                 </div>
             </Link>
             {/* Card 2 */}
-            <Link href="/berita-revisi" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
+            <Link href="/berita-revisi-ttd" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
                 <div className="w-full flex flex-row justify-between items-start">
                     <div className="flex flex-col gap-2">
                         <div className="font-mono flex flex-col gap-1">
@@ -104,7 +104,7 @@ export default function Home() {
                 </div>
             </Link>
             {/* Card 3 */}
-            <Link href="/berita-tolak" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
+            <Link href="/berita-tolak-ttd" className="w-full bg-white shadow-xs border-2 border-[#C5C5D3] rounded-sm flex items-center flex-col gap-3 py-4 px-4">
                 <div className="w-full flex flex-row justify-between items-start">
                     <div className="flex flex-col gap-2">
                         <div className="font-mono flex flex-col gap-1">
