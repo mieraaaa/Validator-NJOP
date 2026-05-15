@@ -30,12 +30,12 @@ export default function Home() {
             </div>
             <div className="w-full flex justify-between items-stretch gap-2 pt-4">
                 {/* Setujui */}
-                <button type="button" className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                <Link href="/validasi-setuju" className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
                     <CircleCheck className="flex size-5 text-[#1B6B51] shrink-0"/>
                     <span className="font-bold text-[16px] text-[#444651]">Setujui</span>
-                </button>
+                </Link>
                 {/* Revisi */}
-                <button type="button" className="flex-1 border-2 border-[#D0C83C] bg-[#FFF8CB] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                <Link href="/validasi-revisi" className="flex-1 border-2 border-[#D0C83C] bg-[#FFF8CB] rounded-sm flex flex-col justify-center items-center py-3 px-2">
                     <Image
                         src="/images/common/logo-revisi.svg"
                         alt="Logo Revisi"
@@ -44,12 +44,12 @@ export default function Home() {
                         className="shrink-0"
                     />
                     <span className="font-bold text-[16px] text-[#341100]">Revisi</span>
-                </button>
+                </Link>
                 {/* Tolak */}
-                <button type="button" className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                <Link href="/validasi-tolak" className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
                     <CircleX className="flex size-5 text-[#BA1A1A] shrink-0"/>
                     <span className="font-bold text-[16px] text-[#444651]">Tolak</span>
-                </button>
+                </Link>
             </div>
         </div>
         {/* Nilai NJOP Baru */}
