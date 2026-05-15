@@ -41,7 +41,7 @@ export default function Home() {
         <div className="w-full border border-[#C5C5D3] bg-[#FAF8FF] flex flex-col gap-5 items-center py-4 px-4">
             <div className="w-full flex flex-col gap-1 font-mono">
                 <h4 className="font-bold text-[11px] text-[#444651]">Nomor Objek Pajak (NOP)</h4>
-                <span className="font-medium text-[14px] text-[#1A1B21]">32.73.040.001.012-0043.0</span>
+                <span className="font-medium text-[14px] text-[#1A1B21] break-all">32.73.040.001.012-0043.0</span>
             </div>
             <div className="w-full flex flex-col gap-1">
                 <h4 className="font-mono font-bold text-[11px] text-[#444651]">Alamat Objek Pajak</h4>
@@ -80,7 +80,7 @@ export default function Home() {
         {/* Bagian Tanda Tangan */}
         <div className="w-full flex justify-between items-end gap-3 text-center text-[#1A1B21]">
             <div className="flex flex-col items-center px-2 flex-1 min-w-0">
-                <h5 className="font-public-sans text-[12px] ">Mengetahui, Supervisor Pemeriksa</h5>
+                <h5 className="font-public-sans text-[12px] min-h-[36px] leading-tight">Mengetahui, Supervisor Pemeriksa</h5>
                 <Image
                     src="/images/common/ttd-supervisor.svg"
                     alt="Logo Tanda Tangan Supervisor"
@@ -93,7 +93,7 @@ export default function Home() {
                 <span className="font-mono font-medium text-[14px] text-[#444651]">NIP. 198012012005011002</span>
             </div>
             <div className="flex flex-col items-center px-2 flex-1 min-w-0">
-                <h5 className="font-public-sans text-[12px] ">Petugas, Penilai Pajak Lapangan</h5>
+                <h5 className="font-public-sans text-[12px] min-h-[36px] leading-tight">Petugas, Penilai Pajak Lapangan</h5>
                 <Image
                     src="/images/common/ttd-petugas.svg"
                     alt="Logo Tanda Tangan Petugas"
