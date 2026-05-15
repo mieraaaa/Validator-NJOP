@@ -189,7 +189,7 @@ export default function Home() {
             </div>
         </div>
         {/* Tombol Logout */}
-        <Link href="/page.tsx" className="w-full bg-[#FFDAD6] rounded-lg flex flex-row justify-center items-center text-[#93000A] gap-4 py-4">
+        <Link href="/" className="w-full bg-[#FFDAD6] rounded-lg flex flex-row justify-center items-center text-[#93000A] gap-4 py-4">
             <Image
                 src="/images/profile/logo-logout.svg"
                 alt="Logo Logout"
