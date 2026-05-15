@@ -18,7 +18,7 @@ export default function Home() {
       </header>
 
       {/* Content */}
-      <div className="w-[93%] mx-auto border border-[#C5C5D3] bg-white mt-4 flex flex-col justify-center items-center gap-5 py-5 px-5">
+      <div className="w-[93%] mx-auto border border-[#C5C5D3] bg-white mt-4 flex flex-col justify-center items-center gap-5 py-5 px-5 shadow-xs">
         {/* Judul */}
         <div className="w-full flex flex-col justify-center items-center text-center gap-2">
             <Image
