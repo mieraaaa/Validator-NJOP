@@ -69,13 +69,14 @@ export default function Home() {
             <div className="bg-[#F4F3F8] rounded-sm flex justify-between items-start px-3 py-3">
                 <div className="flex flex-col gap-1 justify-start font-bold flex-1 min-w-0">
                     <h4 className="text-[14px] text-[#44474F] leading-tight">NJOP yang Disetujui</h4>
-                    <span className="text-[22px] text-[#00236F] leading-tight tracking-tight">Rp 15.500.000 / 
-                        <span className="block"> m² </span>
-                    </span>
+                    <div className="text-[#00236F] leading-tight tracking-tight">
+                        <span className="text-[20px] whitespace-nowrap">Rp 15.500.000</span>
+                        <span className="block text-[20px]"> / m² </span>
+                    </div>
                 </div>
                 <div className="flex flex-col gap-1 text-right items-end font-bold flex-1 min-w-0">
                     <h4 className="text-[14px] text-[#44474F] leading-tight">Total Nilai</h4>
-                    <span className="text-[22px] text-[#00236F] leading-tight tracking-tight">Rp 3,10 
+                    <span className="text-[20px] text-[#00236F] leading-tight tracking-tight">Rp 3,10 
                         <span className="block">Miliar</span>
                     </span>
                 </div>
