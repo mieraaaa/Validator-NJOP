@@ -65,7 +65,7 @@ export default function Home() {
         {/* Estimasi NJOP */}
         <div className="w-full bg-white border-2 border-[#C5C5D3] border-l-[5px] border-l-[#00236F] rounded-md mt-6 py-5 px-4 shadow-xs flex-col justify-center text-center">
             <h3 className="font-bold text-[12px] text-[#444651]">ESTIMASI NJOP BUMI</h3>
-            <div className="flex justify-center items-baseline">
+            <div className="flex justify-center items-center">
                 <span className="font-bold text-[32px] text-[#00236F]">Rp 15.500.000</span>
                 <span className="font-bold text-[16px] text-[#444651]">/m²</span>
             </div>
@@ -80,31 +80,31 @@ export default function Home() {
                 <h4 className="font-mono font-semibold text-[16px] text-[#1A1B21]">Data Pembanding (Radius 500m)</h4>
                 <Map className="size-5 shrink-0 text-[#444651]"/>
             </div>
-            <div className="bg-white w-full border-b-2 border-b-[#C5C5D3] py-3 px-3 flex justify-between items-center">
+            <div className="bg-white w-full border-b-2 border-b-[#C5C5D3] py-3 px-3 flex justify-between items-center gap-3">
                 <div className="flex flex-col gap-1 min-w-0">
                     <div className="flex justify-center items-center gap-1 font-mono font-semibold text-[14px] text-[#1A1B21]">
                         <span className="shrink-0">NOP:</span>
-                        <span className="truncate text-left [direction:rtl]">32.73.010.005.045-0</span>
+                        <span className="truncate text-left [direction:rtl] break-all">32.73.010.005.045-0</span>
                     </div>
                     <span className="text-[#444651] text-[12px]">Jarak: 120m</span>
                 </div>
                 <span className="font-bold text-[14px] text-[#1A1B21] shrink-0">Rp 15.200.000 / m²</span>
             </div>
-            <div className="w-full border-b-2 border-b-[#C5C5D3] py-3 px-3 flex justify-between items-center">
+            <div className="w-full border-b-2 border-b-[#C5C5D3] py-3 px-3 flex justify-between items-center gap-3">
                 <div className="flex flex-col gap-1 min-w-0">
                     <div className="flex justify-center items-center gap-1 font-mono font-semibold text-[14px] text-[#1A1B21]">
                         <span className="shrink-0">NOP:</span>
-                        <span className="truncate text-left [direction:rtl]">32.73.010.005.58-0</span>
+                        <span className="truncate text-left [direction:rtl] break-all">32.73.010.005.58-0</span>
                     </div>
                     <span className="text-[#444651] text-[12px]">Jarak: 250m</span>
                 </div>
                 <span className="font-bold text-[14px] text-[#1A1B21] shrink-0">Rp 14.800.000 / m²</span>
             </div>
-            <div className="bg-white w-full py-3 px-3 flex justify-between items-center">
+            <div className="bg-white w-full py-3 px-3 flex justify-between items-center gap-3">
                 <div className="flex flex-col gap-1 min-w-0">
                     <div className="flex justify-center items-center gap-1 font-mono font-semibold text-[14px] text-[#1A1B21]">
                         <span className="shrink-0">NOP:</span>
-                        <span className="truncate text-left [direction:rtl]">32.73.010.005.62-0</span>
+                        <span className="truncate text-left [direction:rtl] break-all">32.73.010.005.62-0</span>
                     </div>
                     <span className="text-[#444651] text-[12px]">Jarak: 400m</span>
                 </div>

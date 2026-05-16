@@ -68,10 +68,10 @@ export default function Home() {
                         height={78}
                         className="shrink-0 object-cover rounded-md"
                     />
-                    <div className="w-full flex justify-between items-start gap-2">
-                        <div className="pt-3 flex flex-col min-w-0">
+                    <div className="flex-1 flex justify-between items-start gap-2 min-w-0">
+                        <div className="pt-3 flex flex-col flex-1 min-w-0">
                             <h3 className="font-bold text-[12px] text-[#444651]">NOP</h3>
-                            <p className="font-bold text-[14px] text-[#00236F]">32.73.010.005.011-0</p>
+                            <p className="font-bold text-[14px] text-[#00236F] truncate">32.73.010.005.011-0</p>
                             <div className="flex items-center gap-1 mt-1">
                                 <MapPin className="size-4 shrink-0 text-[#444651]"/>
                                 <p className="text-[14px] text-[#1A1B21] leading-tight line-clamp-1">Jl. Sudirman No. 12</p>
@@ -111,10 +111,10 @@ export default function Home() {
                         height={78}
                         className="shrink-0 object-cover rounded-md"
                     />
-                    <div className="w-full flex justify-between items-start gap-2">
-                        <div className="pt-3 flex flex-col min-w-0">
+                    <div className="flex-1 flex justify-between items-start gap-2 min-w-0">
+                        <div className="pt-3 flex flex-col flex-1 min-w-0">
                             <h3 className="font-bold text-[12px] text-[#444651]">NOP</h3>
-                            <p className="font-bold text-[14px] text-[#00236F]">32.73.010.005.011-0</p>
+                            <p className="font-bold text-[14px] text-[#00236F] truncate">32.73.010.005.011-0</p>
                             <div className="flex items-center gap-1 mt-1">
                                 <MapPin className="size-4 shrink-0 text-[#444651]"/>
                                 <p className="text-[14px] text-[#1A1B21] leading-tight line-clamp-1">Komplek Permata B3</p>
@@ -154,10 +154,10 @@ export default function Home() {
                         height={78}
                         className="shrink-0 object-cover rounded-md"
                     />
-                    <div className="w-full flex justify-between items-start gap-2">
-                        <div className="pt-3 flex flex-col min-w-0">
+                    <div className="flex-1 flex justify-between items-start gap-2 min-w-0">
+                        <div className="pt-3 flex flex-col flex-1 min-w-0">
                             <h3 className="font-bold text-[12px] text-[#444651]">NOP</h3>
-                            <p className="font-bold text-[14px] text-[#00236F]">32.73.010.008.022-0</p>
+                            <p className="font-bold text-[14px] text-[#00236F] truncate">32.73.010.008.022-0</p>
                             <div className="flex items-center gap-1 mt-1">
                                 <MapPin className="size-4 shrink-0 text-[#444651]"/>
                                 <p className="text-[14px] text-[#1A1B21] leading-tight line-clamp-1">Jl. Gatot Subroto</p>

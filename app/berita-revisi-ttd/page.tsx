@@ -98,30 +98,34 @@ export default function Home() {
         {/* Bagian Tanda Tangan */}
         <div className="w-full flex justify-between items-start gap-3 text-center text-[#1A1B21]">
             <div className="flex flex-col items-center px-2 flex-1 min-w-0">
-                <h5 className="font-public-sans text-[12px] min-h-[36px] leading-tight">Mengetahui, Supervisor Pemeriksa</h5>
-                <Image
-                    src="/images/common/ttd-supervisor.png"
-                    alt="Logo Tanda Tangan Supervisor"
-                    width={250}
-                    height={250}
-                    className="shrink-0 py-2"        
-                />
+                <h5 className="font-public-sans text-[12px] h-[54px] min-h-[36px] flex items-start justify-center leading-tight">Mengetahui, Supervisor Pemeriksa</h5>
+                <div className="h-[60px] flex items-start justify-center">
+                    <Image
+                        src="/images/common/ttd-supervisor.png"
+                        alt="Logo Tanda Tangan Supervisor"
+                        width={150}
+                        height={150}
+                        className="shrink-0"        
+                    />
+                </div>
                 <hr className="border-[#444651] w-[70%] mx-auto border-t pb-1"/>
                 <span className="font-mono font-semibold text-[16px]">Budi Santoso, S.IP</span>
-                <span className="font-mono font-medium text-[14px] text-[#444651] break all">NIP. 198012012005011002</span>
+                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">NIP. 198012012005011002</span>
             </div>
             <div className="flex flex-col items-center px-2 flex-1 min-w-0">
-                <h5 className="font-public-sans text-[12px] min-h-[36px] leading-tight">Petugas, Penilai Pajak Lapangan</h5>
-                <Image
-                    src="/images/common/ttd-petugas.png"
-                    alt="Logo Tanda Tangan Petugas"
-                    width={250}
-                    height={250}
-                    className="shrink-0 pb-2 pt-2"        
-                />
+                <h5 className="font-public-sans text-[12px] h-[54px] min-h-[36px] flex items-start justify-center leading-tight">Petugas, Penilai Pajak Lapangan</h5>
+                <div className="h-[60px] flex items-start justify-center">
+                    <Image
+                        src="/images/common/ttd-petugas.png"
+                        alt="Logo Tanda Tangan Petugas"
+                        width={150}
+                        height={150}
+                        className="shrink-0"        
+                    />
+                </div>
                 <hr className="border-[#444651] w-[70%] mx-auto border-t pb-1"/>
                 <span className="font-mono font-semibold text-[16px]">Ahmad Hidayat</span>
-                <span className="font-mono font-medium text-[14px] text-[#444651] break all">NIP. 199203152019021001</span>
+                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">NIP. 199203152019021001</span>
             </div>
         </div>
       </div>

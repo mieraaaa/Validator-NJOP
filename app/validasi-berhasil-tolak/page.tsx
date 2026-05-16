@@ -7,7 +7,7 @@ export default function Home() {
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#faf8ff] pb-28 flex justify-center items-center">
 
     {/* Content */}
-    <div className="w-[93%] mx-auto flex flex-col gap-8 justify-center items-center">
+    <div className="w-[93%] mx-auto flex flex-col gap-8 justify-center items-center py-10">
         <div className="bg-[#D1FAE5] border border-[#E2E8F0] rounded-xl flex items-center justify-center py-5 px-5 shadow-xs">
             <CircleCheck className="size-10 text-[#065F46]"/>
         </div>
