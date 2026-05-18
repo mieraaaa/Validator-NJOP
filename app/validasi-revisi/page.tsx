@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from 'next/link';
-import { CircleUser, ArrowLeft, CircleCheck, CircleX, FileText, PencilLine, SendHorizontal } from 'lucide-react';
+import { ArrowLeft, CircleCheck, CircleX, FileText, PencilLine, SendHorizontal } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -9,9 +9,6 @@ export default function Home() {
       {/* Header */}
       <header className="bg-[#FAF8FF] w-full h-[73px] sticky top-0 z-50 flex justify-end items-center border-b border-[#C5C5D3] shadow-xs px-5">
         <h1 className="text-[#00236F] font-bold font-mono text-[24px] absolute left-1/2 -translate-x-1/2">ValidatorNJOP</h1>
-        <Link href="/profile">
-            <CircleUser className="flex size-5 text-[#1A1B21]"/>
-        </Link>
       </header>
 
       {/* Content */}

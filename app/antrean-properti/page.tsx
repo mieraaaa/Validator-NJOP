@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from 'next/link';
-import { CircleUser, Search, CircleAlert, Clock, MapPin, ArrowRight, History, User } from 'lucide-react';
+import { Search, CircleAlert, Clock, MapPin, ArrowRight, History, User } from 'lucide-react';
 import { useEffect, useState } from "react";
 import { usePropertyStore } from "@/store/usePropertyStore";
 
@@ -51,9 +51,6 @@ export default function AntreanProperti() {
       {/* Header */}
       <header className="bg-[#FAF8FF] w-full h-[73px] sticky top-0 flex justify-end items-center border border-[#C5C5D3] shadow-xs z-10">
         <h1 className="text-[#00236F] font-bold font-mono text-[24px] absolute left-1/2 -translate-x-1/2">ValidatorNJOP</h1>
-        <Link href="/profile">
-            <CircleUser className="flex size-5 text-[#1A1B21] mr-5"/>
-        </Link>
       </header>
 
       {/* Content */}
@@ -134,7 +131,7 @@ export default function AntreanProperti() {
                     <div className="text-center py-10 text-[#757682]">Tidak ada antrean properti.</div>
                 ) : (
                     displayAntrean.map((item, idx) => (
-                        <div key={item.nopString} className="w-full bg-white border-2 border-[#C5C5D3] rounded-md py-4 px-4 shadow-xs">
+                        <Link href={`/detail-properti?nop=${item.nopString.replace(/[\.\-]/g, '')}`} key={item.nopString} className="w-full bg-white border-2 border-[#C5C5D3] rounded-md py-4 px-4 shadow-xs">
                             <div className="flex gap-4">
                                 <Image
                                     src={`/images/antrean-properti/rumah-${(idx % 3) + 1}.svg`}
@@ -174,11 +171,8 @@ export default function AntreanProperti() {
                                         {item.deadlineDays} Hari Lagi
                                     </div>
                                 </div>
-                                <Link href={`/detail-properti?nop=${item.nopString.replace(/[\.\-]/g, '')}`} className="shrink-0">
-                                    <ArrowRight className="size-5 text-[#444651]"/>
-                                </Link>
                             </div>
-                        </div>
+                        </Link>
                     ))
                 )}
             </div>
