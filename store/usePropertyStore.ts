@@ -1,17 +1,17 @@
 import { create } from 'zustand';
 import { fetchListAntrean, NopObject, formatNopToString } from '@/lib/api';
 
-export interface PropertyItem {
-  nop: NopObject;
-  nopString: string;
-  jalanOp: string;
-  luasBumi: number;
-  nilaiSistemBumi: number;
-  priority: 'High' | 'Medium' | 'Low'; // Mocked
-  status: 'Baru' | 'Revisi' | 'Ditolak'; // Mocked
-  deadlineDays: number; // Mocked
-  dateReceived: string; // Mocked (ISO Date)
-}
+  export interface PropertyItem {
+    nop: NopObject;
+    nopString: string;
+    jalanOp: string;
+    luasBumi: number;
+    nilaiSistemBumi: number;
+    priority: 'High' | 'Medium' | 'Low'; // Mocked
+    status: 'Baru' | 'Revisi'; // Mocked (Ditolak/Setuju ada di History)
+    deadlineDays: number; // Mocked
+    dateReceived: string; // Mocked (ISO Date)
+  }
 
 interface PropertyStore {
   antrean: PropertyItem[];
@@ -27,9 +27,8 @@ interface PropertyStore {
 function generateMockMetadata(nopStr: string) {
   const sum = Array.from(nopStr).reduce((acc, char) => acc + char.charCodeAt(0), 0);
   
-  let status: 'Baru' | 'Revisi' | 'Ditolak' = 'Baru';
-  if (sum % 4 === 0) status = 'Revisi';
-  else if (sum % 4 === 1) status = 'Ditolak';
+  let status: 'Baru' | 'Revisi' = 'Baru';
+  if (sum % 4 === 0 || sum % 4 === 1) status = 'Revisi';
   
   // Dummy timestamp: Antara hari ini mundur ke 30 hari yang lalu
   const daysOffset = sum % 30;
