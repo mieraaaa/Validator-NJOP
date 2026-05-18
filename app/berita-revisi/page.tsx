@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from 'next/link';
-import { ArrowLeft, Download, CircleCheck } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -12,9 +12,6 @@ export default function Home() {
             <ArrowLeft className="flex size-5 shrink-0"/>
             <h1 className="font-mono font-semibold text-[16px]">Kembali</h1>
         </Link>
-        <button type="button">
-            <Download className="flex size-5 shrink-0 text-[#757682]"/>
-        </button>
       </header>
 
       {/* Content */}
