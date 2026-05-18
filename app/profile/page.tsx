@@ -89,36 +89,21 @@ export default function Home() {
             </div>
             <div className="w-full bg-white border border-[#C5C5D3] rounded-lg shadow-xs flex flex-col justify-start gap-3 py-4">
                 {/* Job Title */}
-                <div className="w-full flex flex-row justify-between items-center px-4">
-                    <div className="flex flex-col justify-start gap-1">
-                        <h3 className="font-mono font-bold text-[11px] text-[#757682]">JOB TITLE</h3>
-                        <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21]">Penilai Pajak Lapangan</span>
-                    </div>
-                    <button type="button"> {/* Ini button buat kemana yah */}
-                        <ChevronRight className="flex size-5 text-[#C5C5D3]"/>
-                    </button>
+                <div className="w-full flex flex-col justify-start gap-1 px-4">
+                    <h3 className="font-mono font-bold text-[11px] text-[#757682]">JOB TITLE</h3>
+                    <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21]">Penilai Pajak Lapangan</span>
                 </div>
                 <hr className="border-[#C5C5D3] w-full mx-auto border-t"/>
                 {/* Department */}
-                <div className="w-full flex flex-row justify-between items-center px-4">
-                    <div className="flex flex-col justify-start gap-1">
-                        <h3 className="font-mono font-bold text-[11px] text-[#757682]">DEPARTMENT</h3>
-                        <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21]">Kantor Pelayanan Pajak Pratama</span>
-                    </div>
-                    <button type="button">
-                        <ChevronRight className="flex size-5 text-[#C5C5D3]"/>
-                    </button>
+                <div className="w-full flex flex-col justify-start gap-1 px-4">
+                    <h3 className="font-mono font-bold text-[11px] text-[#757682]">DEPARTMENT</h3>
+                    <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21]">Kantor Pelayanan Pajak Pratama</span>
                 </div>
                 <hr className="border-[#C5C5D3] w-full mx-auto border-t"/>
                 {/* Assigned Region */}
-                <div className="w-full flex flex-row justify-between items-center px-4">
-                    <div className="flex flex-col justify-start gap-1">
-                        <h3 className="font-mono font-bold text-[11px] text-[#757682]">ASSIGNED REGION</h3>
-                        <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21]">Jakarta Selatan - Tebet & Setiabudi</span>
-                    </div>
-                    <button type="button">
-                        <ChevronRight className="flex size-5 text-[#C5C5D3]"/>
-                    </button>
+                <div className="w-full flex flex-col justify-start gap-1 px-4">
+                    <h3 className="font-mono font-bold text-[11px] text-[#757682]">ASSIGNED REGION</h3>
+                    <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21]">Jakarta Selatan - Tebet & Setiabudi</span>
                 </div>
             </div>
         </div>
@@ -162,22 +147,6 @@ export default function Home() {
                             className="shrink-0 object-cover"
                         />
                         <span className="font-public-sans font-medium text-[16px] text-[#1A1B21]">Change Password</span>
-                    </div>
-                    <button type="button">
-                        <ChevronRight className="flex size-5 text-[#C5C5D3]"/>
-                    </button>
-                </div>
-                {/* Help Center */}
-                <div className="w-full bg-white border border-[#C5C5D3] rounded-lg shadow-xs flex flex-row justify-between items-center gap-1 py-4 px-4">
-                    <div className="flex flex-row justify start items-center gap-5">
-                        <Image
-                            src="/images/profile/logo-help-center.svg"
-                            alt="Logo Help Center"
-                            width={20}
-                            height={20}
-                            className="shrink-0 object-cover"
-                        />
-                        <span className="font-public-sans font-medium text-[16px] text-[#1A1B21]">Help Center</span>
                     </div>
                     <button type="button">
                         <ChevronRight className="flex size-5 text-[#C5C5D3]"/>
