@@ -131,7 +131,7 @@ export default function AntreanProperti() {
                     <div className="text-center py-10 text-[#757682]">Tidak ada antrean properti.</div>
                 ) : (
                     displayAntrean.map((item, idx) => (
-                        <div key={item.nopString} className="w-full bg-white border-2 border-[#C5C5D3] rounded-md py-4 px-4 shadow-xs">
+                        <Link href={`/detail-properti?nop=${item.nopString.replace(/[\.\-]/g, '')}`} key={item.nopString} className="w-full bg-white border-2 border-[#C5C5D3] rounded-md py-4 px-4 shadow-xs">
                             <div className="flex gap-4">
                                 <Image
                                     src={`/images/antrean-properti/rumah-${(idx % 3) + 1}.svg`}
@@ -171,11 +171,8 @@ export default function AntreanProperti() {
                                         {item.deadlineDays} Hari Lagi
                                     </div>
                                 </div>
-                                <Link href={`/detail-properti?nop=${item.nopString.replace(/[\.\-]/g, '')}`} className="shrink-0">
-                                    <ArrowRight className="size-5 text-[#444651]"/>
-                                </Link>
                             </div>
-                        </div>
+                        </Link>
                     ))
                 )}
             </div>
