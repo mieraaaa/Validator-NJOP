@@ -259,12 +259,12 @@ function DetailPropertiContent() {
               
               {/* Foreground Values Plotting */}
               <div className="w-full absolute inset-0 pt-16">
-                  {/* Rata-rata Kelurahan */}
+                  {/* Rata-rata Area */}
                   <div className="absolute flex flex-col items-center justify-center text-center -translate-x-1/2 -translate-y-1/2 transition-all duration-500" 
                        style={{ left: '20%', bottom: `${getPercentage(rataRata)}%` }}>
                       <span className="font-public-sans text-[12px] text-[#444651] whitespace-nowrap">{formatM(rataRata)}</span>
                       <hr className="border-t-2 border-[#C5C5D3] w-10 my-1"/>
-                      <span className="font-bold text-[10px] text-[#444651] leading-tight">Rata-rata <br/> Kelurahan </span>
+                      <span className="font-bold text-[10px] text-[#444651] leading-tight">Rata-rata <br/> Area </span>
                   </div>
                   
                   {/* Objek Ini */}
@@ -278,12 +278,12 @@ function DetailPropertiContent() {
                       <span className="font-bold text-[10px] leading-tight">Objek <br/> Ini</span>
                   </div>
                   
-                  {/* Max Radius */}
+                  {/* Nilai Tertinggi Area */}
                   <div className="absolute flex flex-col items-center justify-center text-center -translate-x-1/2 -translate-y-1/2 transition-all duration-500"
                        style={{ left: '80%', bottom: `${getPercentage(maxRadius)}%` }}>
-                      <span className="font-public-sans text-[12px] text-[#444651] whitespace-nowrap">{formatM(maxRadius)}</span>
+                      <span className="font-public-sans text-[12px] text-[#444651] max-w-[70px]">{formatM(maxRadius)}</span>
                       <hr className="border-t-2 border-[#C5C5D3] w-10 my-1"/>
-                      <span className="font-bold text-[10px] text-[#444651] leading-tight">Max <br/> Radius</span>
+                      <p className="font-bold text-[10px] text-[#444651] leading-tight max-w-[80px] break-words">Nilai Tertinggi Area</p>
                   </div>
                   
                   {/* Connecting Line (Optional logic for connecting dots could go here, skipped for simplicity) */}
