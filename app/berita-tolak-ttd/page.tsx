@@ -1,8 +1,47 @@
+"use client";
+
 import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft, Download, CircleX } from 'lucide-react';
+import { useRef } from 'react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 export default function Home() {
+    const pdfRef = useRef<HTMLDivElement>(null);
+
+    const handleDownloadPDF = async () => {
+        const element = pdfRef.current;
+        if (!element) return;
+
+        const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            scrollY: -window.scrollY,
+            windowHeight: element.scrollHeight
+        });
+        const imgData = canvas.toDataURL('image/png');
+
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+        });
+
+        const pdfPageWidth = pdf.internal.pageSize.getWidth();
+        const pdfPageHeight = pdf.internal.pageSize.getHeight();
+
+        const ratio = Math.min(pdfPageWidth / canvas.width, pdfPageHeight / canvas.height);
+
+        const finalWidth = canvas.width * ratio;
+        const finalHeight = canvas.height * ratio;
+
+        const marginX = (pdfPageWidth - finalWidth) / 2;
+
+        pdf.addImage(imgData, 'PNG', marginX, 0, finalWidth, finalHeight);
+        pdf.save('Berita-Acara-Tolak-Validasi-NJOP.pdf');
+    };
+
   return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc] pb-5">
 
@@ -12,13 +51,13 @@ export default function Home() {
             <ArrowLeft className="flex size-5 shrink-0"/>
             <h1 className="font-mono font-semibold text-[16px]">Kembali</h1>
         </Link>
-        <button type="button">
+        <button type="button" onClick={handleDownloadPDF}>
             <Download className="flex size-5 shrink-0 text-[#757682]"/>
         </button>
       </header>
 
       {/* Content */}
-      <div className="w-[93%] mx-auto border border-[#C5C5D3] bg-white mt-4 flex flex-col justify-center items-center gap-5 py-5 px-5 shadow-xs">
+      <div ref={pdfRef} className="w-[93%] mx-auto border border-[#C5C5D3] bg-white mt-4 flex flex-col justify-center items-center gap-5 py-5 px-5 shadow-xs">
         {/* Judul */}
         <div className="w-full flex flex-col justify-center items-center text-center gap-2">
             <Image
@@ -45,7 +84,7 @@ export default function Home() {
             </div>
             <div className="w-full flex flex-col gap-1">
                 <h4 className="font-mono font-bold text-[11px] text-[#444651]">Alamat Objek Pajak</h4>
-                <span className="font-public-sans text-[14px] text-[#1A1B21] leading-tight line-clamp-2">Jl. Merdeka Barat No. 14, RT 02 / RW 05, Kel. Sukamaju, Kec. Jatinegara</span>
+                <span className="font-public-sans text-[14px] text-[#1A1B21] leading-tight">Jl. Merdeka Barat No. 14, RT 02 / RW 05, Kel. Sukamaju, Kec. Jatinegara</span>
             </div>
             <div className="w-full flex flex-col gap-1 font-mono">
                 <h4 className="font-bold text-[11px] text-[#444651]">Luas Bumi (M²)</h4>
