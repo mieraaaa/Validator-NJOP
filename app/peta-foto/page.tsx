@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from 'next/link';
-import { CircleUser, ArrowLeft, Camera, Clock, LocateFixed } from 'lucide-react';
+import { ArrowLeft, Camera, Clock, LocateFixed } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -49,9 +49,6 @@ function PetaFotoContent() {
             <ArrowLeft className="flex size-5 text-[#1A1B21]"/>
         </Link>
         <h1 className="text-[#00236F] font-bold font-mono text-[24px] absolute left-1/2 -translate-x-1/2">ValidatorNJOP</h1>
-        <Link href="/profile">
-            <CircleUser className="flex size-5 text-[#1A1B21]"/>
-        </Link>
       </header>
 
       {/* Content */}

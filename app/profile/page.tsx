@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from 'next/link';
-import { CircleUser, History, User, ChevronRight, LogOut } from 'lucide-react';
+import { History, User, ChevronRight } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -9,9 +9,6 @@ export default function Home() {
       {/* Header */}
       <header className="bg-[#FAF8FF] w-full h-[73px] sticky top-0 flex justify-end items-center border border-[#C5C5D3] shadow-xs">
         <h1 className="text-[#00236F] font-bold font-mono text-[24px] absolute left-1/2 -translate-x-1/2">ValidatorNJOP</h1>
-        <Link href="/profile">
-            <CircleUser className="flex size-5 text-[#1A1B21] mr-5"/>
-        </Link>
       </header>
 
       {/* Content */}
