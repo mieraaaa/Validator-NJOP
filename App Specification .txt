@@ -1,0 +1,259 @@
+﻿SPESIFIKASI APLIKASI
+ValidatorNJOP: Aplikasi Validasi Penilai Properti 
+Sistem Manajemen Pajak Bumi dan Bangunan
+________________
+
+
+
+
+Mata Kuliah: Pengembangan Aplikasi Mobile
+Dosen Pengampu: Dr. Lukman Heryawan, S.T., M.T.
+Tanggal Pengumpulan: 30 April 2026
+
+
+
+
+1. Identitas Kelompok
+No
+	Nama
+	NIM
+	1
+	Miera Ardiyanti Farica
+
+
+	(24/534436/PA/22665)
+
+
+	2
+	Chelsea Natasja Jesslyne Sembiring
+
+
+	(24/543571/PA/23097)
+
+
+	3
+	Keyne Elvaretta Zulfa Arafah
+
+
+	(24/533391/PA/22572)
+
+
+	4
+	Kesya Izumi
+
+
+	(24/533729/PA/22612)
+
+
+	
+
+2. Deskripsi Aplikasi
+ValidatorNJOP adalah aplikasi web responsif yang dirancang untuk membantu Penilai Properti bersertifikasi dalam melakukan validasi dan pengambilan keputusan terhadap estimasi Nilai Jual Objek Pajak (NJOP) dalam sistem Pajak Bumi dan Bangunan (PBB). Aplikasi ini berfungsi sebagai layer validasi akhir yang menghubungkan hasil estimasi dari sistem backend eksternal dengan proses persetujuan resmi oleh penilai, sehingga memastikan transparansi, akuntabilitas, dan efisiensi dalam workflow penilaian. Melalui fitur utama seperti daftar antrian properti berbasis prioritas wilayah, tampilan detail properti yang terintegrasi dengan peta dan data pendukung, workflow keputusan (setujui, revisi, tolak), serta tanda tangan digital, aplikasi ini memfasilitasi proses evaluasi yang terstruktur dan terdokumentasi. Sistem ini tidak melakukan perhitungan NJOP secara mandiri, melainkan berfokus pada digitalisasi proses validasi dan pencatatan keputusan, termasuk dukungan offline capability (dengan pengecualian tanda tangan digital) dan audit trail untuk menjaga integritas data dan keamanan proses.
+	3. Goals & Success Metrics
+* Mempercepat proses validasi properti (dibandingkan simulasi manual): Rata-rata waktu penyelesaian 1 validasi properti ≤ 3–5 menit dalam uji coba pengguna
+* Mendukung alur kerja penilai secara end-to-end: Minimal 70% pengguna uji coba dapat menyelesaikan ≥ 3 validasi properti dalam satu sesi tanpa bantuan
+* Kelengkapan data keputusan: Minimal 90% keputusan yang disubmit memiliki catatan alasan yang terisi
+* Fungsi utama MVP berjalan dengan baik
+* Implementasi dasar tanda tangan digital
+* Dukungan offline sederhana
+* Audit trail dasar: Setiap aksi (setujui/revisi/tolak) menyimpan data user, waktu, dan aksi secara konsisten pada seluruh pengujian
+* User experience dasar yang dapat diterima: Minimal skor 3.5/5 dari pengguna uji coba pada aspek kemudahan penggunaan
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	4. Arsitektur Sistem
+
+
+
+
+	  
+
+5. Spesifikasi Fitur
+5.1 Functional Requirements
+	
+
+No
+	Fitur
+	Deskripsi
+	FR01
+	Autentikasi & Akses
+	Sistem harus menampilkan halaman login dengan input NIP/ID penilai dan password
+	FR02
+	Antrian Properti
+	* Daftar properti yang menunggu persetujuan
+* Filter dan sortir: berdasarkan wilayah/kecamatan, prioritas (deadline), status (baru/direvisi/ditolak sebelumnya)
+* Badge prioritas: merah (urgent), kuning (normal), abu-abu (baru masuk)
+* Menampilkan jumlah total properti dalam antrian
+	FR03
+	Detail Properti & Estimasi NJOP
+	* Informasi identitas properti: NOP, alamat, luas tanah, luas bangunan, tahun bangun
+* Estimasi NJOP yang dihasilkan sistem beserta breakdown faktornya
+* Rincian metode penilaian yang digunakan (pasar/biaya/pendapatan) dan bobot masing-masing faktor
+* Data objek pembanding: properti sejenis di sekitar beserta nilainya
+* Visualisasi perbandingan: grafik atau tabel sederhana yang mudah dibaca cepat
+* Menampilkan tanggal estimasi NJOP yang dibuat
+	FR04
+	Peta & Foto Lapangan
+	* Peta lokasi properti 
+* Foto lapangan yang diunggah enumerator untuk properti tersebut
+* Informasi kontekstual: jarak ke fasilitas publik, akses jalan, zona wilayah
+* Indikator apakah foto sudah diperbarui (tanggal pengambilan foto harus jelas)
+	FR05
+	Keputusan Penilai 
+	* Tiga tombol aksi utama: Setujui, Revisi Nilai, Tolak
+* Catatan alasan sebelum aksi apapun dapat dilanjutkan
+* Setujui: langsung ke alur tanda tangan
+* Revisi Nilai: penilai input nilai baru beserta alasan revisi, kemudian ke tanda tangan
+* Tolak: penilai wajib mengisi alasan penolakan, lalu konfirmasi
+* Halaman konfirmasi akhir sebelum keputusan dikirim, berisi: jenis keputusan, nilai NJOP final, dan catatan penilai
+	FR06
+	Tanda Tangan Digital
+	* Integrasi dengan PSrE tersertifikasi Kominfo (BSrE untuk konteks pemerintah, atau PrivyID/Peruri Sign)
+* Preview dokumen keputusan sebelum penilai menandatangani
+* Alur: autentikasi identitas penilai → preview dokumen keputusan → tanda tangan → konfirmasi berhasil
+* Dokumen yang ditandatangani: berisi NOP, nilai NJOP, metode, catatan penilai, timestamp, identitas penilai
+	FR07
+	Riwayat Keputusan
+	* Daftar semua keputusan yang pernah dibuat oleh penilai tersebut
+* Setiap entri riwayat harus menampilkan: NOP, alamat singkat, jenis keputusan, nilai NJOP final, dan tanggal keputusan
+* Filter: per periode waktu, per jenis keputusan (setuju/revisi/tolak), per wilayah
+* Detail tiap keputusan: bisa dibuka ulang untuk review
+	5.2 Non-Functional Requirements
+
+
+No
+	Fitur
+	Deskripsi
+	NFR01
+	Performa 
+	* Loading data properti: maksimal 2 detik dengan koneksi normal
+* Peta tile caching: area dalam radius penugasan di-cache otomatis
+* Ukuran app: wajar untuk Android mid-range (mayoritas device pemerintah)
+	NFR02
+	Keamanan & Legal
+	* Autentikasi: minimal PIN
+* Enkripsi data lokal saat offline
+* Audit trail: setiap aksi penilai (buka properti, buat keputusan, tanda tangan) harus ter-log dengan timestamp
+* Data retention: riwayat keputusan tidak boleh dihapus (permanen)
+	
+
+
+
+
+
+________________
+
+
+6. Alur Kerja Aplikasi
+  
+
+	7. Rencana Pembagian Tugas
+Anggota
+	Tugas Utama
+	Target Selesai
+	Anggota 1
+	Pembuatan wireframe dan desain UI/UX high-fidelity di Figma untuk halaman Login, Antrean Properti, dan Detail Penilaian
+	Minggu 1–2
+	Anggota 2
+	Slicing desain UI Figma menjadi komponen frontend statis yang responsive menggunakan Next.js dan Tailwind CSS
+	Minggu 2–4
+	Anggota 3
+	Setup project routing, manajemen state, dan integrasi GET API (mengonsumsi dan menampilkan data antrean serta rincian estimasi NJOP)
+	Minggu 3–5
+	Anggota 4
+	Implementasi fitur Kanvas Tanda Tangan Digital, integrasi POST/PUT API untuk aksi persetujuan (Setuju/Revisi/Tolak), serta QA/Testing keseluruhan aplikasi
+	Minggu 4–6
+	
+
+8. Stack Teknologi
+
+
+Komponen
+	
+
+Teknologi
+	Frontend
+	Next.js, Tailwind CSS
+
+
+	Pengelolaan Data Frontend
+	oRPC Client, Zustand
+
+
+	Backend
+	FastAPI (Python)
+
+
+	Database & Penyimpanan File
+	Supabase
+	Sumber data utama
+	API SimPBB
+	Layanan eksternal
+	Google maps, Cloudinary
+	9. Constraints & Assumptions
+1. Asumsi (Assumptions) 
+Asumsi adalah kondisi yang dianggap benar dan harus terpenuhi agar aplikasi dapat berjalan sesuai rencana.
+* Akses Pengguna: Pengguna aplikasi (Penilai Properti) diasumsikan sudah terdaftar di sistem pusat dan memiliki hak akses atau kredensial login yang sah.
+* Ketersediaan Data: Data properti dasar, seperti foto lapangan terkini yang diambil oleh enumerator dan faktor penentu harga pasar, diasumsikan sudah tersedia dan dapat diakses melalui API yang diberikan oleh mitra.
+* Struktur dan Respons API: Format data (response) yang dikembalikan oleh API penilai dan estimasi NJOP diasumsikan sudah final dan sesuai dengan dokumentasi yang disepakati, sehingga tidak memerlukan manipulasi data yang kompleks di sisi frontend.
+* Kinerja API: Sistem backend (API) yang disediakan mitra diasumsikan berjalan stabil dan mampu menghasilkan perhitungan estimasi NJOP secara akurat untuk divalidasi.
+* Perangkat Keras: Perangkat mobile yang digunakan oleh penilai diasumsikan memiliki layar sentuh (touchscreen) yang berfungsi dengan baik untuk mendukung operasional fitur kanvas tanda tangan digital.
+* Konektivitas: Pengguna diasumsikan memiliki koneksi internet yang stabil untuk melakukan sinkronisasi data antrean dan mengirimkan keputusan persetujuan ke server. 
+
+
+2. Batasan Masalah (Constraints)
+Batasan adalah ruang lingkup pengerjaan yang membatasi sistem agar pengembangan tetap fokus pada target MVP selama setengah semester.
+* Batas Waktu Pengerjaan: Mengingat keterbatasan waktu, pengembangan hanya difokuskan hingga tahap Minimum Viable Product (MVP) yang dijadwalkan selesai dalam waktu setengah semester. Fitur-fitur tambahan di luar alur utama persetujuan NJOP tidak termasuk dalam cakupan fase ini.
+* Fokus Fungsionalitas: Aplikasi hanya berfokus pada digitalisasi workflow persetujuan penetapan nilai pajak (menerima antrean, meninjau estimasi, dan memberikan keputusan). Aplikasi tidak memiliki fitur untuk manajemen user (CRUD entitas penilai) atau pengisian data lapangan (karena merupakan tugas enumerator).
+* Logika Perhitungan: Aplikasi bertindak sebatas antarmuka (interface) penyajian data. Aplikasi ini tidak melakukan komputasi algoritma perhitungan NJOP secara mandiri, melainkan murni bergantung pada estimasi yang dihasilkan oleh sistem backend.
+* Tanda Tangan Digital: Pada fase MVP ini, fitur tanda tangan digital sebagai bukti persetujuan resmi diimplementasikan dalam bentuk drawing canvas yang hasil guratannya disimpan sebagai file gambar/Base64. Fitur ini belum diintegrasikan dengan otoritas sertifikat elektronik pihak ketiga (seperti BSrE atau e-Meterai).
+* Platform: Aplikasi dikembangkan menggunakan teknologi web (Next.js dan Tailwind CSS) yang dioptimalkan untuk perangkat mobile. Jika diperlukan keluaran berupa file instalasi (installer), aplikasi akan dibungkus menggunakan runtime hybrid (seperti Capacitor).

@@ -1,0 +1,73 @@
+{
+  "json": {
+    "kdPropinsi": "51",
+    "kdDati2": "72",
+    "kdKecamatan": "010",
+    "kdKelurahan": "002",
+    "kdBlok": "003",
+    "noUrut": "0094",
+    "kdJnsOp": "0",
+    "subjekPajakId": "2789902631",
+    "noFormulirSpop": "14784863812",
+    "jnsTransaksiOp": "2",
+    "kdPropinsiBersama": null,
+    "kdDati2Bersama": null,
+    "kdKecamatanBersama": null,
+    "kdKelurahanBersama": null,
+    "kdBlokBersama": null,
+    "noUrutBersama": null,
+    "kdJnsOpBersama": null,
+    "kdPropinsiAsal": null,
+    "kdDati2Asal": null,
+    "kdKecamatanAsal": null,
+    "kdKelurahanAsal": null,
+    "kdBlokAsal": null,
+    "noUrutAsal": null,
+    "kdJnsOpAsal": null,
+    "noSpptLama": null,
+    "jalanOp": "JL. MASA LALU PAHIT NO. 176",
+    "blokKavNoOp": "BLOK A / 88",
+    "kelurahanOp": "KELURAHAN 8",
+    "rwOp": "12",
+    "rtOp": "006",
+    "kdStatusWp": "1",
+    "luasBumi": 1497,
+    "kdZnt": "AA",
+    "jnsBumi": "1",
+    "nilaiSistemBumi": 1291207410,
+    "tglPendataanOp": "2026-04-25T00:00:00.000Z",
+    "nmPendataanOp": "Admin User",
+    "nipPendata": "743747884",
+    "tglPemeriksaanOp": "2026-02-15T00:00:00.000Z",
+    "nmPemeriksaanOp": "TRI TUSUK OMPONG",
+    "nipPemeriksaOp": "324473654",
+    "noPersil": "",
+    "subjekPajak": {
+      "subjekPajakId": "2789902631",
+      "nmWp": "YANTI BANTAL GOSONG",
+      "jalanWp": "JL. TANJAKAN RUSAK NO. 147",
+      "blokKavNoWp": "BLOK B / 88",
+      "rwWp": "04",
+      "rtWp": "034",
+      "kelurahanWp": "BANTAL GULING",
+      "kotaWp": "KABUPATEN NGEGAS",
+      "kdPosWp": "23978",
+      "telpWp": "+506 5067 2671",
+      "npwp": "6658117983",
+      "statusPekerjaanWp": "1",
+      "emailWp": "yun.popova785@juno.org"
+    },
+    "anggota": null,
+    "induk": null
+  },
+  "meta": [
+    [
+      1,
+      "tglPendataanOp"
+    ],
+    [
+      1,
+      "tglPemeriksaanOp"
+    ]
+  ]
+}
