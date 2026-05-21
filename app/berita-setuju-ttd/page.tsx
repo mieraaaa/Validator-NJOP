@@ -6,6 +6,7 @@ import { ArrowLeft, Download, CircleCheck } from 'lucide-react';
 import { useRef } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 
 export default function Home() {
     const pdfRef = useRef<HTMLDivElement>(null);
@@ -39,7 +40,22 @@ export default function Home() {
         const marginX = (pdfPageWidth - finalWidth) / 2;
 
         pdf.addImage(imgData, 'PNG', marginX, 0, finalWidth, finalHeight);
-        pdf.save('Berita-Acara-Setuju-Validasi-NJOP.pdf');
+
+        try {
+            const pdfBase64 = pdf.output('datauristring');
+            const base64Data = pdfBase64.split(',')[1];
+
+            const result = await Filesystem.writeFile({
+                path: 'Berita-Acara-Setuju-Validasi-NJOP.pdf',
+                data: base64Data,
+                directory: Directory.Documents,
+            });
+
+            alert('Sukses! PDF berhasil disimpan di folder Dokumen HP Anda.');
+        } catch (error) {
+            console.error('Gagal menyimpan PDF:', error);
+            alert('Gagal menyimpan PDF. Silahkan coba lagi!');
+        };    
     };
 
   return (
