@@ -46,7 +46,7 @@ export default function Home() {
             const base64Data = pdfBase64.split(',')[1];
 
             const result = await Filesystem.writeFile({
-                path: 'Berita-Acara-Setuju-Validasi-NJOP.pdf',
+                path: 'Berita-Acara-Tolak-Validasi-NJOP.pdf',
                 data: base64Data,
                 directory: Directory.Documents,
             });
