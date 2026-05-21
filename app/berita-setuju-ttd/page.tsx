@@ -45,6 +45,13 @@ export default function Home() {
             const pdfBase64 = pdf.output('datauristring');
             const base64Data = pdfBase64.split(',')[1];
 
+            // Meminta izin akses penyimpanan (Storage Permission) di Android
+            try {
+                await Filesystem.requestPermissions();
+            } catch (e) {
+                console.warn('Gagal meminta izin, mungkin sudah diberikan atau ditolak:', e);
+            }
+
             const result = await Filesystem.writeFile({
                 path: 'Berita-Acara-Setuju-Validasi-NJOP.pdf',
                 data: base64Data,
@@ -52,10 +59,10 @@ export default function Home() {
             });
 
             alert('Sukses! PDF berhasil disimpan di folder Dokumen HP Anda.');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Gagal menyimpan PDF:', error);
-            alert('Gagal menyimpan PDF. Silahkan coba lagi!');
-        };    
+            alert('Gagal menyimpan PDF: ' + (error.message || 'Izin penyimpanan ditolak atau folder tidak tersedia.'));
+        }
     };
 
   return (
