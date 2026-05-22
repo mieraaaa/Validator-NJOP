@@ -6,6 +6,7 @@ import { ArrowLeft, Download, CircleX } from 'lucide-react';
 import { useRef } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 
 export default function Home() {
@@ -45,17 +46,24 @@ export default function Home() {
             const pdfBase64 = pdf.output('datauristring');
             const base64Data = pdfBase64.split(',')[1];
 
+            // Simpan ke memori sementara (Cache) yang kebal dari error Permission
             const result = await Filesystem.writeFile({
                 path: 'Berita-Acara-Tolak-Validasi-NJOP.pdf',
                 data: base64Data,
-                directory: Directory.Documents,
+                directory: Directory.Cache,
             });
 
-            alert('Sukses! PDF berhasil disimpan di folder Dokumen HP Anda.');
-        } catch (error) {
+            // Panggil menu Share/Save bawaan HP Android
+            await Share.share({
+                title: 'Berita Acara Validasi NJOP',
+                url: result.uri,
+                dialogTitle: 'Simpan atau Bagikan PDF'
+            });
+
+        } catch (error: any) {
             console.error('Gagal menyimpan PDF:', error);
-            alert('Gagal menyimpan PDF. Silahkan coba lagi!');
-        };    
+            alert('Gagal menyimpan PDF: ' + (error.message || 'Error tidak diketahui.'));
+        }
     };
 
   return (
