@@ -4,16 +4,15 @@ import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft, CircleCheck, CircleX, FileText, PencilLine, SendHorizontal } from 'lucide-react';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, Suspense } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { supabase } from '@/lib/supabase';
 import { useSearchParams } from 'next/navigation';
 
-export default function Home() {
+function ValidasiRevisiContent() {
     const searchParams = useSearchParams();
     const nopProperti = searchParams.get('nop') || '31.71.040.003.012-0051.0';
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [ttdPenilai, setTtdPenilai] = useState<string | null>(null);
     const sigCanvas = useRef<SignatureCanvas>(null);
 
@@ -30,7 +29,6 @@ export default function Home() {
 
         if (base64String) {
             setTtdPenilai(base64String);
-            setIsModalOpen(false);
 
             try {
                 const { data, error } = await supabase
@@ -199,4 +197,16 @@ export default function Home() {
       </div>
     </main>
   );
+}
+
+export default function ValidasiRevisiPage() {
+return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center font-mono text-[14px] text-[#00236F]">
+                Menyiapkan Halaman Validasi...
+            </div>
+        }>
+            <ValidasiRevisiContent />
+        </Suspense>
+    );    
 }
