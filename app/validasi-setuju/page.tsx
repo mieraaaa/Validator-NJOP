@@ -46,6 +46,7 @@ export default function Home() {
                 }
 
                 console.log(`Tanda tangan untuk NOP ${nopProperti} berhasil disimpan di database.`);
+                alert("Tanda tangan berhasil disimpan ke sistem.");
 
             } catch (error: any) {
                 console.error("Gagal menyimpan tanda tangan:", JSON.stringify(error, null, 2) || error.message);
