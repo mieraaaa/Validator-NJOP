@@ -3,13 +3,59 @@
 import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft, Download } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useEffect, useState, Suspense } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { supabase } from '@/lib/supabase';
+import { useSearchParams } from 'next/navigation';
 
-export default function Home() {
+function BeritaRevisiContent() {
+    const searchParams = useSearchParams();
+    const nopProperti = searchParams.get('nop') || '31.71.040.003.012-0051.0';
+
+    const [ttdPenilai, setTtdPenilai] = useState<string | null>(null);
+    const [namaPenilai, setNamaPenilai] = useState<string>("Memuat nama...");
+    const [nipPenilai, setNipPenilai] = useState<string>("Memuat NIP...");
+
+    useEffect(() => {
+        const fetchTandaTangan = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('decisions')
+                    .select(`
+                        ttd_url,
+                        users (
+                            nama,
+                            nip
+                        )
+                    `)
+                    .eq('nop', nopProperti)
+                    .single();
+
+                if (error) throw error;
+
+                if (data) {
+                    if (data.ttd_url) {
+                        setTtdPenilai(data.ttd_url);
+                    }
+                    
+                    if (data.users) {
+                        const userData = Array.isArray(data.users) ? data.users[0] : data.users;
+                        
+                        setNamaPenilai(userData.nama || "Nama Tidak Ditemukan");
+                        setNipPenilai(userData.nip || "-");
+                    }
+                }
+            } catch (error) {
+                console.error("Gagal menarik data lengkap:", error);
+            }
+        };
+
+        fetchTandaTangan();
+    }, [nopProperti]);
+
     const pdfRef = useRef<HTMLDivElement>(null);
 
     const handleDownloadPDF = async () => {
@@ -160,6 +206,7 @@ export default function Home() {
         <hr className="border-[#C5C5D3] w-full mx-auto border-t mt-8"/>
         {/* Bagian Tanda Tangan */}
         <div className="w-full flex justify-between items-start gap-3 text-center text-[#1A1B21]">
+            {/* Bagian Supervisor */}
             <div className="flex flex-col items-center px-2 flex-1 min-w-0">
                 <h5 className="font-public-sans text-[12px] h-[54px] min-h-[36px] flex items-start justify-center leading-tight">Mengetahui, Supervisor Pemeriksa</h5>
                 <div className="h-[60px] flex items-start justify-center">
@@ -175,23 +222,38 @@ export default function Home() {
                 <span className="font-mono font-semibold text-[16px]">Budi Santoso, S.IP</span>
                 <span className="font-mono font-medium text-[14px] text-[#444651] break-all">NIP. 198012012005011002</span>
             </div>
+            {/* Bagian Petugas */}
             <div className="flex flex-col items-center px-2 flex-1 min-w-0">
                 <h5 className="font-public-sans text-[12px] h-[54px] min-h-[36px] flex items-start justify-center leading-tight">Petugas, Penilai Pajak Lapangan</h5>
                 <div className="h-[60px] flex items-start justify-center">
-                    <Image
-                        src="/images/common/ttd-petugas.png"
-                        alt="Logo Tanda Tangan Petugas"
-                        width={150}
-                        height={150}
-                        className="shrink-0"        
-                    />
+                    {ttdPenilai ? (
+                        <img
+                            src={ttdPenilai}
+                            alt="Tanda Tangan Penilai"
+                            className="h-full object-contain mix-blend-multiply"
+                        />
+                    ) : (
+                        <span className="text-[10px] text-gray-400 mt-4">Memuat TTD...</span>
+                    )}
                 </div>
                 <hr className="border-[#444651] w-[70%] mx-auto border-t pb-1"/>
-                <span className="font-mono font-semibold text-[16px]">Ahmad Hidayat</span>
-                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">NIP. 199203152019021001</span>
+                <span className="font-mono font-semibold text-[16px]">{namaPenilai}</span>
+                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">NIP. {nipPenilai}</span>
             </div>
         </div>
       </div>
     </main>
   );
+}
+
+export default function BeritaAcaraRevisiPage() {
+return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center font-mono text-[14px] text-[#00236F]">
+                Menyiapkan Berita Acara...
+            </div>
+        }>
+            <BeritaRevisiContent />
+        </Suspense>
+    );    
 }
