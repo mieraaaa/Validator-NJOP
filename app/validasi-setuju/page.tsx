@@ -35,8 +35,11 @@ export default function Home() {
             try {
                 const { data, error } = await supabase
                     .from('decisions')
-                    .update({ ttd_base64: base64String })
-                    .eq('nop', nopProperti);
+                    .upsert({
+                        nop: nopProperti,
+                        ttd_url: base64String,
+                        status_keputusan: 'Draf'
+                    }, { onConflict: 'nop' });
 
                 if (error) {
                     throw error;
@@ -44,8 +47,8 @@ export default function Home() {
 
                 console.log(`Tanda tangan untuk NOP ${nopProperti} berhasil disimpan di database.`);
 
-            } catch (error) {
-                console.error("Gagal menyimpan tanda tangan:", error);
+            } catch (error: any) {
+                console.error("Gagal menyimpan tanda tangan:", JSON.stringify(error, null, 2) || error.message);
                 alert("Gagal menyimpan ke database, cek koneksi internet Anda.");
             }
         }
