@@ -1,9 +1,57 @@
+"use client";
+
 import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft, CircleCheck, CircleX, FileText, PencilLine, SendHorizontal } from 'lucide-react';
 
+import { useRef, useState } from 'react';
+import SignatureCanvas from 'react-signature-canvas';
+import { supabase } from '@/lib/supabase';
+import { useSearchParams } from 'next/navigation';
+
 export default function Home() {
-  return (
+    const searchParams = useSearchParams();
+    const nopProperti = searchParams.get('nop') || '31.71.040.003.012-0051.0';
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [ttdPenilai, setTtdPenilai] = useState<string | null>(null);
+    const sigCanvas = useRef<SignatureCanvas>(null);
+
+    const clearSignature = () => {
+        sigCanvas.current?.clear();
+    };
+
+    const saveSignature = async () => {
+        if (sigCanvas.current?.isEmpty()) {
+            alert("Tanda tangan tidak boleh kosong.");
+            return;
+        }
+        const base64String = sigCanvas.current?.getTrimmedCanvas().toDataURL('image/png');
+
+        if (base64String) {
+            setTtdPenilai(base64String);
+            setIsModalOpen(false);
+
+            try {
+                const { data, error } = await supabase
+                    .from('decisions')
+                    .update({ ttd_base64: base64String })
+                    .eq('nop', nopProperti);
+
+                if (error) {
+                    throw error;
+                }
+
+                console.log(`Tanda tangan untuk NOP ${nopProperti} berhasil disimpan di database.`);
+
+            } catch (error) {
+                console.error("Gagal menyimpan tanda tangan:", error);
+                alert("Gagal menyimpan ke database, cek koneksi internet Anda.");
+            }
+        }
+    };
+  
+    return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-hidden bg-[#f8fafc]">
 
       {/* Header */}
@@ -86,18 +134,31 @@ export default function Home() {
                     <PencilLine className="flex size-3"/>
                     <h5 className="font-bold text-[14px]">Tanda Tangan Digital</h5>
                 </div>
-                <button type="button" className="font-mono font-bold text-[12px] text-[#00236F]">Bersihkan</button>
+                {/* Tombol Hapus */}
+                <button type="button" onClick={clearSignature} className="font-mono font-bold text-[12px] text-[#00236F]">Bersihkan</button>
             </div>
-            <div className="w-full bg-[#FAF8FF] border border-dashed border-[#757682] h-48 rounded-sm flex flex-col gap-1 justify-center items-center">
-                <Image
-                    src="/images/common/logo-ttd.svg"
-                    alt="Logo Tanda Tangan"
-                    width={24}
-                    height={24}
-                    className="shrink-0"
-                />
-                <span className="font-bold text-[14px] text-[#9f9fa8]">Area Tanda Tangan</span>
-            </div>
+            {/* Area Kanvas */}
+            <div className="relative w-full bg-[#FAF8FF] border border-dashed border-[#757682] h-48 rounded-sm flex flex-col gap-1 justify-center items-center overflow-hidden">
+                <div className="absolute inset-0 flex flex-col gap-2 justify-center items-center pointer-events-none">
+                    <Image
+                        src="/images/common/logo-ttd.svg"
+                        alt="Logo Tanda Tangan"
+                        width={24}
+                        height={24}
+                        className="shrink-0"
+                    />
+                    <span className="font-bold text-[14px] text-[#9f9fa8]">Area Tanda Tangan</span>
+                </div>
+                <SignatureCanvas
+                        ref={sigCanvas}
+                        penColor="#1A1B21"
+                        canvasProps={{ className: 'absolute inset-0 w-full h-full' }}
+                    />
+                </div>
+            {/* Tombol Simpan */}
+            <button onClick={saveSignature} type="button" className="w-full bg-[#1E3A8A] rounded-lg flex justify-center items-center font-mono font-semibold text-[16px] text-white py-3">
+                Simpan Tanda Tangan
+            </button>
         </div>
         <hr className="border-[#C5C5D3] w-full mx-auto mt-8 mb-4"/>
         {/* Tombol Bawah */}
