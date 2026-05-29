@@ -161,7 +161,10 @@ export default function Home() {
                 <SignatureCanvas
                         ref={sigCanvas}
                         penColor="#1A1B21"
-                        canvasProps={{ className: 'absolute inset-0 w-full h-full' }}
+                        canvasProps={{ 
+                            className: 'absolute inset-0 w-full h-full',
+                            style: { touchAction: 'none' } 
+                        }}
                     />
                 </div>
             {/* Tombol Simpan */}
