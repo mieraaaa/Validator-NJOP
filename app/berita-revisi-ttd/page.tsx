@@ -3,16 +3,15 @@
 import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft, Download } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useEffect, useState, Suspense } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { useSearchParams } from 'next/navigation';
 
-export default function Home() {
+function BeritaRevisiContent() {
     const searchParams = useSearchParams();
     const nopProperti = searchParams.get('nop') || '31.71.040.003.012-0051.0';
 
@@ -245,4 +244,16 @@ export default function Home() {
       </div>
     </main>
   );
+}
+
+export default function BeritaAcaraRevisiPage() {
+return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center font-mono text-[14px] text-[#00236F]">
+                Menyiapkan Berita Acara...
+            </div>
+        }>
+            <BeritaRevisiContent />
+        </Suspense>
+    );    
 }
