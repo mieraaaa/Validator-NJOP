@@ -1,8 +1,30 @@
+"use client";
+
 import Image from "next/image";
 import Link from 'next/link';
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { History, User, ChevronRight } from 'lucide-react';
+import { getCurrentUser, logout, UserSession } from '@/lib/auth';
 
 export default function Home() {
+  const router = useRouter();
+  const [user, setUser] = useState<UserSession | null>(null);
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    router.push("/");
+  };
+
+  // Format Nama Lengkap dan Gelar jika default, atau nama dari DB
+  const displayNama = user?.nama || "Ahmad Hidayat, S.E., M.Ak.";
+  const displayNip = user?.nip || "199203152019021001";
+  const displayRole = user?.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : "Official";
+
   return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#faf8ff] pb-28">
 
@@ -38,10 +60,10 @@ export default function Home() {
             </div>
             {/* Data Petugas */}
             <div className="flex flex-col justify-start gap-1 font-mono">
-                <h1 className="font-semibold text-[20px] text-[#1A1B21]">Ahmad Hidayat</h1>
-                <span className="text-[14px] text-[#444651] break-all">NIP: 199203152019021001</span>
-                <div className="bg-[#A6F2D1] rounded-sm shrink-0 flex justify-center items-center w-fit px-2 py-1">
-                    <span className="font-bold text-[11px] text-[#237157]">Verified Official</span>
+                <h1 className="font-semibold text-[18px] text-[#1A1B21] leading-snug">{displayNama.split(',')[0]}</h1>
+                <span className="text-[13px] text-[#444651] break-all">NIP: {displayNip}</span>
+                <div className="bg-[#A6F2D1] rounded-sm shrink-0 flex justify-center items-center w-fit px-2 py-0.5 mt-1">
+                    <span className="font-bold text-[11px] text-[#237157]">{displayRole} Verified</span>
                 </div>
             </div>
         </div>
@@ -61,12 +83,14 @@ export default function Home() {
                 {/* Full Name */}
                 <div className="w-full bg-white border border-[#C5C5D3] rounded-lg shadow-xs flex flex-col justify-start gap-1 py-4 px-4">
                     <h3 className="font-mono font-bold text-[11px] text-[#757682]">FULL NAME</h3>
-                    <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21]">Ahmad Hidayat, S.E., M.Ak.</span>
+                    <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21]">{displayNama}</span>
                 </div>
                 {/* Email Address */}
                 <div className="w-full bg-white border border-[#C5C5D3] rounded-lg shadow-xs flex flex-col justify-start gap-1 py-4 px-4">
                     <h3 className="font-mono font-bold text-[11px] text-[#757682]">EMAIL ADDRESS</h3>
-                    <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21] truncate">ahmad.hidayat@pajak.go.id</span>
+                    <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21] truncate">
+                      {user ? `${user.nama.toLowerCase().replace(/[^a-z0-9]/g, '')}@pajak.go.id` : 'ahmad.hidayat@pajak.go.id'}
+                    </span>
                 </div>
                 {/* Phone Number */}
                 <div className="w-full bg-white border border-[#C5C5D3] rounded-lg shadow-xs flex flex-col justify-start gap-1 py-4 px-4">
@@ -91,7 +115,9 @@ export default function Home() {
                 {/* Job Title */}
                 <div className="w-full flex flex-col justify-start gap-1 px-4">
                     <h3 className="font-mono font-bold text-[11px] text-[#757682]">JOB TITLE</h3>
-                    <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21]">Penilai Pajak Lapangan</span>
+                    <span className="font-public-sans font-semibold text-[16px] text-[#1A1B21]">
+                      {user?.role === 'admin' ? 'IT Administrator' : 'Penilai Pajak Lapangan'}
+                    </span>
                 </div>
                 <hr className="border-[#C5C5D3] w-full mx-auto border-t"/>
                 {/* Department */}
@@ -155,7 +181,10 @@ export default function Home() {
             </div>
         </div>
         {/* Tombol Logout */}
-        <Link href="/" className="w-full bg-[#FFDAD6] rounded-lg flex flex-row justify-center items-center text-[#93000A] gap-4 py-4">
+        <button 
+          onClick={handleLogout}
+          className="w-full bg-[#FFDAD6] rounded-lg flex flex-row justify-center items-center text-[#93000A] gap-4 py-4 cursor-pointer hover:bg-[#FFC4C0] transition-colors"
+        >
             <Image
                 src="/images/profile/logo-logout.svg"
                 alt="Logo Logout"
@@ -163,8 +192,8 @@ export default function Home() {
                 height={18}
                 className="shrink-0 object-cover"
             />
-            <span className="font-mono text-[16px]">Logout</span>
-        </Link>
+            <span className="font-mono text-[16px] font-bold">Logout</span>
+        </button>
       </div>
 
       {/* Footer */}
