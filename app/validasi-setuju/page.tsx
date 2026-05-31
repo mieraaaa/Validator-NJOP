@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft, CircleCheck, CircleX, FileText, PencilLine, SendHorizontal } from 'lucide-react';
-import { fetchDetailProperti, parseStringToNop, fetchListBangunan } from "@/lib/api";
+import { fetchDetailProperti, fetchListBangunan } from "@/lib/api";
 
 import { useRef, useState, Suspense, useEffect } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
@@ -11,14 +11,13 @@ import { supabase } from '@/lib/supabase';
 import { useSearchParams } from 'next/navigation';
 
 function ValidasiSetujuContent() {
-const searchParams = useSearchParams();
-    // Default NOP
-    const nopProperti = searchParams.get('nop') || '31.71.040.003.012-0051.0';
+    const searchParams = useSearchParams();
+    const nopProperti = searchParams.get('nop') || '317104000301200510';
 
     const rawNop = nopProperti ? nopProperti.replace(/\D/g, '') : '';
-    const formattedNop = rawNop.length == 18 ? (
-        `${rawNop.substring(0, 2)}.${rawNop.substring(2, 4)}.${rawNop.substring(4, 7)}.${rawNop.substring(7, 10)}.${rawNop.substring(10, 13)}-${rawNop.substring(13, 17)}.${rawNop.substring(17, 18)}`
-    ) : nopProperti;
+    const formattedNop = rawNop.length === 18 
+        ? `${rawNop.substring(0, 2)}.${rawNop.substring(2, 4)}.${rawNop.substring(4, 7)}.${rawNop.substring(7, 10)}.${rawNop.substring(10, 13)}-${rawNop.substring(13, 17)}.${rawNop.substring(17, 18)}`
+        : nopProperti;
 
     // State untuk TTD (Supabase)
     const [ttdPenilai, setTtdPenilai] = useState<string | null>(null);
@@ -32,11 +31,19 @@ const searchParams = useSearchParams();
 
     useEffect(() => {
         const fetchSemuaData = async () => {
-            if (!formattedNop) return;
+            if (!rawNop || rawNop.length !== 18) return;
             setIsLoadingData(true);
 
             try {
-                const nopObj = parseStringToNop(formattedNop);
+                const nopObj = {
+                    kdPropinsi: rawNop.substring(0, 2),
+                    kdDati2: rawNop.substring(2, 4),
+                    kdKecamatan: rawNop.substring(4, 7),
+                    kdKelurahan: rawNop.substring(7, 10),
+                    kdBlok: rawNop.substring(10, 13),
+                    noUrut: rawNop.substring(13, 17),
+                    kdJnsOp: rawNop.substring(17, 18),
+                };
                 
                 const [detailData, bangunanData] = await Promise.all([
                     fetchDetailProperti(nopObj).catch((err) => {
@@ -57,7 +64,7 @@ const searchParams = useSearchParams();
                 const { data: supabaseData, error: supabaseError } = await supabase
                     .from('decisions')
                     .select('ttd_url, users (nama, nip)')
-                    .eq('nop', formattedNop)
+                    .eq('nop', rawNop)
                     .single();
 
                 if (!supabaseError && supabaseData) {
@@ -78,7 +85,7 @@ const searchParams = useSearchParams();
         };
 
         fetchSemuaData();
-    }, [nopProperti, formattedNop]);
+    }, [nopProperti]);
 
     const sigCanvas = useRef<SignatureCanvas>(null);
 
@@ -100,7 +107,7 @@ const searchParams = useSearchParams();
                 const { data, error } = await supabase
                     .from('decisions')
                     .upsert({
-                        nop: nopProperti,
+                        nop: rawNop,
                         ttd_url: base64String,
                         status_keputusan: 'Draf'
                     }, { onConflict: 'nop' });
@@ -109,7 +116,7 @@ const searchParams = useSearchParams();
                     throw error;
                 }
 
-                console.log(`Tanda tangan untuk NOP ${nopProperti} berhasil disimpan di database.`);
+                console.log(`Tanda tangan untuk NOP ${rawNop} berhasil disimpan di database.`);
                 alert("Tanda tangan berhasil disimpan ke sistem.");
 
             } catch (error: any) {
@@ -118,7 +125,7 @@ const searchParams = useSearchParams();
             }
         }
     };
-  
+   
     return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-hidden bg-[#f8fafc]">
 
@@ -130,7 +137,7 @@ const searchParams = useSearchParams();
       {/* Content */}
       <div className="w-[93%] mx-auto mt-4">
         <div className="w-full flex justify-start items-center gap-2">
-            <Link href={`/detail-properti?nop=${nopProperti}`}>
+            <Link href={`/detail-properti?nop=${rawNop || nopProperti}`}>
                 <ArrowLeft className="flex size-6 text-[#444651] shrink-0"/>
             </Link>
             <h2 className="font-mono font-bold text-[24px] text-[#1A1B21]">Validasi Keputusan</h2>
@@ -143,12 +150,12 @@ const searchParams = useSearchParams();
             </div>
             <div className="w-full flex justify-between items-stretch gap-2 pt-4">
                 {/* Setujui */}
-                <Link href={`/validasi-setuju?nop=${nopProperti}`} className="flex-1 border-2 border-[#006E11] rounded-sm bg-[#D9FFDA] flex flex-col justify-center items-center py-3 px-2">
+                <Link href={`/validasi-setuju?nop=${rawNop || nopProperti}`} className="flex-1 border-2 border-[#006E11] rounded-sm bg-[#D9FFDA] flex flex-col justify-center items-center py-3 px-2">
                     <CircleCheck className="flex size-5 text-[#1B6B51] shrink-0"/>
                     <span className="font-bold text-[16px] text-[#341100]">Setujui</span>
                 </Link>
                 {/* Revisi */}
-                <Link href={`/validasi-revisi?nop=${nopProperti}`} className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                <Link href={`/validasi-revisi?nop=${rawNop || nopProperti}`} className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
                     <Image
                         src="/images/common/logo-revisi.svg"
                         alt="Logo Revisi"
@@ -159,7 +166,7 @@ const searchParams = useSearchParams();
                     <span className="font-bold text-[16px] text-[#444651]">Revisi</span>
                 </Link>
                 {/* Tolak */}
-                <Link href={`/validasi-tolak?nop=${nopProperti}`} className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                <Link href={`/validasi-tolak?nop=${rawNop || nopProperti}`} className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
                     <CircleX className="flex size-5 text-[#BA1A1A] shrink-0"/>
                     <span className="font-bold text-[16px] text-[#444651]">Tolak</span>
                 </Link>
@@ -235,12 +242,12 @@ const searchParams = useSearchParams();
         {/* Tombol Bawah */}
         <div className="w-full flex flex-col gap-4">
             {/* Preview Draf Berita Acara */}
-            <Link href={`/berita-setuju?nop=${nopProperti}`} className="w-full border border-[#757682] rounded-lg flex justify-center items-center gap-2 text-[#1A1B21] py-3">
+            <Link href={`/berita-setuju?nop=${rawNop || nopProperti}`} className="w-full border border-[#757682] rounded-lg flex justify-center items-center gap-2 text-[#1A1B21] py-3">
                 <FileText className="flex size-5 shrink-0"/>
                 <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
             </Link>
             {/* Konfirmasi & Kirim */}
-            <Link href={`/validasi-berhasil-setuju?nop=${nopProperti}`} className="w-full bg-[#1E3A8A] rounded-lg flex justify-center items-center gap-2 text-[#90A8FF] py-3">
+            <Link href={`/validasi-berhasil-setuju?nop=${rawNop || nopProperti}`} className="w-full bg-[#1E3A8A] rounded-lg flex justify-center items-center gap-2 text-[#90A8FF] py-3">
                 <span className="font-mono font-semibold text-[16px]">Konfirmasi & Kirim</span>
                 <SendHorizontal className="flex size-6 shrink-0"/>
             </Link>
@@ -261,7 +268,7 @@ const searchParams = useSearchParams();
 }
 
 export default function ValidasiSetujuPage() {
-return (
+    return (
         <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center font-mono text-[14px] text-[#00236F]">
                 Menyiapkan Halaman Validasi...
