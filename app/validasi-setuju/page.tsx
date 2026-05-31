@@ -8,10 +8,11 @@ import { fetchDetailProperti, fetchListBangunan } from "@/lib/api";
 import { useRef, useState, Suspense, useEffect } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { supabase } from '@/lib/supabase';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 function ValidasiSetujuContent() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const nopProperti = searchParams.get('nop') || '317104000301200510';
 
     const rawNop = nopProperti ? nopProperti.replace(/\D/g, '') : '';
@@ -28,6 +29,8 @@ function ValidasiSetujuContent() {
     const [detailProperti, setDetailProperti] = useState<any>(null);
     const [luasBangunanTotal, setLuasBangunanTotal] = useState<number>(0);
     const [isLoadingData, setIsLoadingData] = useState(true);
+
+    const isFormValid = ttdPenilai !== null && !isLoadingData;
 
     useEffect(() => {
         const fetchSemuaData = async () => {
@@ -91,6 +94,7 @@ function ValidasiSetujuContent() {
 
     const clearSignature = () => {
         sigCanvas.current?.clear();
+        setTtdPenilai(null);
     };
 
     const saveSignature = async () => {
@@ -109,19 +113,17 @@ function ValidasiSetujuContent() {
                     .upsert({
                         nop: rawNop,
                         ttd_url: base64String,
-                        status_keputusan: 'Draf'
+                        status_keputusan: 'Disetujui'
                     }, { onConflict: 'nop' });
 
                 if (error) {
                     throw error;
                 }
 
-                console.log(`Tanda tangan untuk NOP ${rawNop} berhasil disimpan di database.`);
                 alert("Tanda tangan berhasil disimpan ke sistem.");
 
-            } catch (error: any) {
-                console.error("Gagal menyimpan tanda tangan:", JSON.stringify(error, null, 2) || error.message);
-                alert("Gagal menyimpan ke database, cek koneksi internet Anda.");
+            } catch (err) {
+                console.error("Gagal menyimpan tanda tangan:", err);
             }
         }
     };
@@ -246,11 +248,22 @@ function ValidasiSetujuContent() {
                 <FileText className="flex size-5 shrink-0"/>
                 <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
             </Link>
-            {/* Konfirmasi & Kirim */}
-            <Link href={`/validasi-berhasil-setuju?nop=${rawNop || nopProperti}`} className="w-full bg-[#1E3A8A] rounded-lg flex justify-center items-center gap-2 text-[#90A8FF] py-3">
+{/* Konfirmasi & Kirim */}
+            <button 
+                onClick={() => {
+                    if (!isFormValid) return;
+                    router.push(`/validasi-berhasil-setuju?nop=${rawNop || nopProperti}`);
+                }}
+                disabled={!isFormValid}
+                className={`w-full rounded-lg flex justify-center items-center gap-2 py-3 transition-opacity ${
+                    isFormValid
+                        ? 'bg-[#1E3A8A] text-[#90A8FF] cursor-pointer'
+                        : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                }`}
+            >
                 <span className="font-mono font-semibold text-[16px]">Konfirmasi & Kirim</span>
                 <SendHorizontal className="flex size-6 shrink-0"/>
-            </Link>
+            </button>
         </div>
         <div className="w-full bg-[#EEEDF4] rounded-sm flex justify-between items-start text-start gap-2 my-5 px-3 py-3">
             <Image

@@ -3,12 +3,31 @@
 import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft, CircleCheck, CircleX, FileText, SendHorizontal } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function ValidasiTolak() {
+export default function ValidasiTolakPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center font-mono text-[14px] text-[#00236F]">
+                Menyiapkan Halaman Validasi...
+            </div>
+        }>
+            <ValidasiTolakContent />
+        </Suspense>
+    );
+}
+
+function ValidasiTolakContent() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const nopProperti = searchParams.get('nop') || '317104000301200510';
     const rawNop = nopProperti ? nopProperti.replace(/\D/g, '') : '';
+
+    const [alasan, setAlasan] = useState<string>('');
+    const [tindakan, setTindakan] = useState<string>('');
+
+    const isFormValid = alasan.trim() !== '' && tindakan.trim() !== '';
 
     return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc]">
@@ -65,7 +84,12 @@ export default function ValidasiTolak() {
                 </label>
                 <span className="text-[12px] text-[#444651]">Wajib Diisi</span>
             </div>
-            <textarea rows={4} id="alasan" name="alasan"
+            <textarea 
+                rows={4} 
+                id="alasan" 
+                name="alasan"
+                value={alasan}
+                onChange={(e) => setAlasan(e.target.value)}
                 className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
                 placeholder="Uraikan alasan penolakan secara mendetail berdasarkan peraturan atau temuan lapangan yang berlaku..."
             ></textarea>
@@ -79,7 +103,12 @@ export default function ValidasiTolak() {
                 </label>
                 <span className="text-[12px] text-[#444651]">Wajib Diisi</span>
             </div>
-            <textarea rows={3} id="tindakan" name="tindakan"
+            <textarea 
+                rows={3} 
+                id="tindakan" 
+                name="tindakan"
+                value={tindakan}
+                onChange={(e) => setTindakan(e.target.value)}
                 className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
                 placeholder="Uraikan langkah perbaikan atau instruksi selanjutnya untuk pemohon..."
             ></textarea>
@@ -93,10 +122,21 @@ export default function ValidasiTolak() {
                 <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
             </Link>
             {/* Konfirmasi & Kirim */}
-            <Link href={`/validasi-berhasil-tolak?nop=${rawNop || nopProperti}`} className="w-full bg-[#1E3A8A] rounded-lg flex justify-center items-center gap-2 text-[#90A8FF] py-3">
+            <button 
+                onClick={() => {
+                    if (!isFormValid) return;
+                    router.push(`/validasi-berhasil-tolak?nop=${rawNop || nopProperti}`);
+                }}
+                disabled={!isFormValid}
+                className={`w-full rounded-lg flex justify-center items-center gap-2 py-3 transition-opacity ${
+                    isFormValid
+                        ? 'bg-[#1E3A8A] text-[#90A8FF] cursor-pointer'
+                        : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                }`}
+            >
                 <span className="font-mono font-semibold text-[16px]">Konfirmasi & Kirim</span>
                 <SendHorizontal className="flex size-5 shrink-0"/>
-            </Link>
+            </button>
         </div>
         <div className="w-full bg-[#EEEDF4] rounded-sm flex justify-between items-start text-start gap-2 my-5 px-3 py-3">
             <Image
