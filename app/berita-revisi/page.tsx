@@ -1,8 +1,30 @@
+"use client";
+
 import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { getCurrentUser } from '@/lib/auth';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
+    const [user, setUser] = useState<any>(null);
+    const [isLoadingUser, setIsLoadingUser] = useState(true);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const userData = await getCurrentUser(); 
+                setUser(userData);
+            } catch (error) {
+                console.error("Gagal menarik data user:", error);
+            } finally {
+                setIsLoadingUser(false);
+            }
+        };
+        
+        fetchUser();
+    }, []);
+
   return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc] pb-5">
 
@@ -121,8 +143,8 @@ export default function Home() {
                     />
                 </div>
                 <hr className="border-[#444651] w-[70%] mx-auto border-t pb-1"/>
-                <span className="font-mono font-semibold text-[16px]">Ahmad Hidayat</span>
-                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">NIP. 199203152019021001</span>
+                <span className="font-mono font-semibold text-[16px]">{isLoadingUser ? 'Memuat Nama...' : (user?.nama || 'Ahmad Hidayat')}</span>
+                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">{isLoadingUser ? 'Memuat NIP...' : (user?.nip ? `NIP. ${user.nip}` : 'NIP. 199203152019021001')}</span>
             </div>
         </div>
       </div>
