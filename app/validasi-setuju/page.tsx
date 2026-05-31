@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft, CircleCheck, CircleX, FileText, PencilLine, SendHorizontal } from 'lucide-react';
 import { fetchDetailProperti, fetchListBangunan } from "@/lib/api";
+import { getCurrentUser } from '@/lib/auth';
 
 import { useRef, useState, Suspense, useEffect } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
@@ -11,6 +12,8 @@ import { supabase } from '@/lib/supabase';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 function ValidasiSetujuContent() {
+    const [user, setUser] = useState<any>(null);
+    const [isLoadingUser, setIsLoadingUser] = useState(true);
     const searchParams = useSearchParams();
     const router = useRouter();
     const nopProperti = searchParams.get('nop') || '317104000301200510';
@@ -248,11 +251,33 @@ function ValidasiSetujuContent() {
                 <FileText className="flex size-5 shrink-0"/>
                 <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
             </Link>
-{/* Konfirmasi & Kirim */}
+            {/* Konfirmasi & Kirim */}
             <button 
-                onClick={() => {
+                onClick={async () => {
                     if (!isFormValid) return;
-                    router.push(`/validasi-berhasil-setuju?nop=${rawNop || nopProperti}`);
+                    
+                    try {
+                        const { error } = await supabase
+                            .from('decisions')
+                            .update({
+                                status_keputusan: 'Setuju',
+                                user_id: user?.id,
+                                nilai_njop_lama: detailProperti?.nilaiSistemBumi || 0,
+                                nilai_njop_final: detailProperti?.nilaiSistemBumi || 0,
+                                detail_keputusan: {
+                                    catatan: "Sesuai dengan kondisi faktual di lapangan."
+                                }
+                            })
+                            .eq('nop', rawNop);
+
+                        if (error) throw error;
+
+                        router.push(`/validasi-berhasil-setuju?nop=${rawNop || nopProperti}`);
+
+                    } catch (error: any) {
+                        console.error("Gagal mengirim detail keputusan:", error.message);
+                        alert("Gagal mengirim data final ke server. Silakan coba lagi.");
+                    }
                 }}
                 disabled={!isFormValid}
                 className={`w-full rounded-lg flex justify-center items-center gap-2 py-3 transition-opacity ${

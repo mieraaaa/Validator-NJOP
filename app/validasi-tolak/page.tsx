@@ -3,8 +3,11 @@
 import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft, CircleCheck, CircleX, FileText, SendHorizontal } from 'lucide-react';
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { fetchDetailProperti, parseStringToNop } from "@/lib/api";
+import { getCurrentUser } from '@/lib/auth';
 
 export default function ValidasiTolakPage() {
     return (
@@ -38,6 +41,32 @@ function ValidasiTolakContent() {
         }
         return '';
     });
+
+    const formattedNop = rawNop.length === 18 ? (
+        `${rawNop.substring(0, 2)}.${rawNop.substring(2, 4)}.${rawNop.substring(4, 7)}.${rawNop.substring(7, 10)}.${rawNop.substring(10, 13)}-${rawNop.substring(13, 17)}.${rawNop.substring(17, 18)}`
+    ) : nopProperti;
+
+    const [user, setUser] = useState<any>(null);
+    const [detailProperti, setDetailProperti] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!rawNop || rawNop.length !== 18) return;
+            try {
+                // Tarik data user aktif
+                const userData = await getCurrentUser();
+                setUser(userData);
+
+                // Tarik data properti lama dari sistem Bapenda
+                const nopObj = parseStringToNop(formattedNop);
+                const detailData = await fetchDetailProperti(nopObj).catch(() => null);
+                setDetailProperti(detailData);
+            } catch (error) {
+                console.error("Gagal menarik data pendukung:", error);
+            }
+        };
+        fetchData();
+    }, [rawNop, formattedNop]);
 
     const isFormValid = alasan.trim() !== '' && tindakan.trim() !== '';
 
@@ -147,9 +176,38 @@ function ValidasiTolakContent() {
             </Link>
             {/* Konfirmasi & Kirim */}
             <button 
-                onClick={() => {
+                onClick={async () => {
                     if (!isFormValid) return;
-                    router.push(`/validasi-berhasil-tolak?nop=${rawNop || nopProperti}`);
+                    
+                    try {
+                        const { error } = await supabase
+                            .from('decisions')
+                            .update({
+                                status_keputusan: 'Tolak',
+                                user_id: user?.id,
+                                nilai_njop_lama: detailProperti?.nilaiSistemBumi || 0,
+                                nilai_njop_final: detailProperti?.nilaiSistemBumi || 0,
+                                detail_keputusan: {
+                                    alasan_penolakan: alasan,
+                                    tindakan_lanjutan: tindakan
+                                }
+                            })
+                            .eq('nop', rawNop);
+
+                        if (error) throw error;
+
+                        if (typeof window !== 'undefined') {
+                            window.localStorage.removeItem(storageKey('alasan'));
+                            window.localStorage.removeItem(storageKey('tindakan'));
+                            window.localStorage.removeItem(storageKey('ttd'));
+                        }
+
+                        router.push(`/validasi-berhasil-tolak?nop=${rawNop || nopProperti}`);
+
+                    } catch (error: any) {
+                        console.error("Gagal mengirim detail keputusan:", error.message);
+                        alert("Gagal mengirim data final ke server. Silakan coba lagi.");
+                    }
                 }}
                 disabled={!isFormValid}
                 className={`w-full rounded-lg flex justify-center items-center gap-2 py-3 transition-opacity ${
@@ -159,7 +217,7 @@ function ValidasiTolakContent() {
                 }`}
             >
                 <span className="font-mono font-semibold text-[16px]">Konfirmasi & Kirim</span>
-                <SendHorizontal className="flex size-5 shrink-0"/>
+                <SendHorizontal className="flex size-6 shrink-0"/>
             </button>
         </div>
         <div className="w-full bg-[#EEEDF4] rounded-sm flex justify-between items-start text-start gap-2 my-5 px-3 py-3">
