@@ -1,9 +1,47 @@
+"use client";
+
 import Image from "next/image";
 import Link from 'next/link';
-import { ArrowLeft, CircleCheck, CircleX, FileText, PencilLine, SendHorizontal } from 'lucide-react';
+import { ArrowLeft, CircleCheck, CircleX, FileText, SendHorizontal } from 'lucide-react';
+import { useState, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function Home() {
-  return (
+export default function ValidasiTolakPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center font-mono text-[14px] text-[#00236F]">
+                Menyiapkan Halaman Validasi...
+            </div>
+        }>
+            <ValidasiTolakContent />
+        </Suspense>
+    );
+}
+
+function ValidasiTolakContent() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const nopProperti = searchParams.get('nop') || '317104000301200510';
+    const rawNop = nopProperti ? nopProperti.replace(/\D/g, '') : '';
+    
+    const storageKey = (field: string) => `validasi-tolak-${field}-${rawNop}`;
+
+    const [alasan, setAlasan] = useState<string>(() => {
+        if (typeof window !== 'undefined') {
+            return window.localStorage.getItem(storageKey('alasan')) || '';
+        }
+        return '';
+    });
+    const [tindakan, setTindakan] = useState<string>(() => {
+        if (typeof window !== 'undefined') {
+            return window.localStorage.getItem(storageKey('tindakan')) || '';
+        }
+        return '';
+    });
+
+    const isFormValid = alasan.trim() !== '' && tindakan.trim() !== '';
+
+    return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc]">
 
       {/* Header */}
@@ -14,7 +52,7 @@ export default function Home() {
       {/* Content */}
       <div className="w-[93%] mx-auto mt-4">
         <div className="w-full flex justify-start items-center gap-2">
-            <Link href="/detail-properti">
+            <Link href={`/detail-properti?nop=${rawNop || nopProperti}`}>
                 <ArrowLeft className="flex size-6 text-[#444651] shrink-0"/>
             </Link>
             <h2 className="font-mono font-bold text-[24px] text-[#1A1B21]">Validasi Keputusan</h2>
@@ -27,12 +65,12 @@ export default function Home() {
             </div>
             <div className="w-full flex justify-between items-stretch gap-2 pt-4">
                 {/* Setujui */}
-                <Link href="/validasi-setuju" className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                <Link href={`/validasi-setuju?nop=${rawNop || nopProperti}`} className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
                     <CircleCheck className="flex size-5 text-[#1B6B51] shrink-0"/>
                     <span className="font-bold text-[16px] text-[#444651]">Setujui</span>
                 </Link>
                 {/* Revisi */}
-                <Link href="/validasi-revisi" className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                <Link href={`/validasi-revisi?nop=${rawNop || nopProperti}`} className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
                     <Image
                         src="/images/common/logo-revisi.svg"
                         alt="Logo Revisi"
@@ -43,7 +81,7 @@ export default function Home() {
                     <span className="font-bold text-[16px] text-[#444651]">Revisi</span>
                 </Link>
                 {/* Tolak */}
-                <Link href="/validasi-tolak" className="flex-1 border-2 border-[#A31708] bg-[#FFDAD6] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                <Link href={`/validasi-tolak?nop=${rawNop || nopProperti}`} className="flex-1 border-2 border-[#A31708] bg-[#FFDAD6] rounded-sm flex flex-col justify-center items-center py-3 px-2">
                     <CircleX className="flex size-5 text-[#BA1A1A] shrink-0"/>
                     <span className="font-bold text-[16px] text-[#341100]">Tolak</span>
                 </Link>
@@ -58,7 +96,18 @@ export default function Home() {
                 </label>
                 <span className="text-[12px] text-[#444651]">Wajib Diisi</span>
             </div>
-            <textarea rows={4} id="alasan" name="alasan"
+            <textarea 
+                rows={4} 
+                id="alasan" 
+                name="alasan"
+                value={alasan}
+                  onChange={(e) => {
+                      const val = e.target.value;
+                      setAlasan(val);
+                      if (typeof window !== 'undefined') {
+                          window.localStorage.setItem(storageKey('alasan'), val);
+                      }
+                  }}
                 className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
                 placeholder="Uraikan alasan penolakan secara mendetail berdasarkan peraturan atau temuan lapangan yang berlaku..."
             ></textarea>
@@ -72,7 +121,18 @@ export default function Home() {
                 </label>
                 <span className="text-[12px] text-[#444651]">Wajib Diisi</span>
             </div>
-            <textarea rows={3} id="tindakan" name="tindakan"
+            <textarea 
+                rows={3} 
+                id="tindakan" 
+                name="tindakan"
+                value={tindakan}
+                      onChange={(e) => {
+                          const val = e.target.value;
+                          setTindakan(val);
+                          if (typeof window !== 'undefined') {
+                              window.localStorage.setItem(storageKey('tindakan'), val);
+                          }
+                      }}
                 className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
                 placeholder="Uraikan langkah perbaikan atau instruksi selanjutnya untuk pemohon..."
             ></textarea>
@@ -81,15 +141,26 @@ export default function Home() {
         {/* Tombol Bawah */}
         <div className="w-full flex flex-col gap-4">
             {/* Preview Draf Berita Acara */}
-            <Link href="/berita-tolak" className="w-full border border-[#757682] rounded-lg flex justify-center items-center gap-2 text-[#1A1B21] py-3">
+            <Link href={`/berita-tolak?nop=${rawNop || nopProperti}`} className="w-full border border-[#757682] rounded-lg flex justify-center items-center gap-2 text-[#1A1B21] py-3">
                 <FileText className="flex size-5 shrink-0"/>
                 <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
             </Link>
             {/* Konfirmasi & Kirim */}
-            <Link href="/validasi-berhasil-tolak" className="w-full bg-[#1E3A8A] rounded-lg flex justify-center items-center gap-2 text-[#90A8FF] py-3">
+            <button 
+                onClick={() => {
+                    if (!isFormValid) return;
+                    router.push(`/validasi-berhasil-tolak?nop=${rawNop || nopProperti}`);
+                }}
+                disabled={!isFormValid}
+                className={`w-full rounded-lg flex justify-center items-center gap-2 py-3 transition-opacity ${
+                    isFormValid
+                        ? 'bg-[#1E3A8A] text-[#90A8FF] cursor-pointer'
+                        : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                }`}
+            >
                 <span className="font-mono font-semibold text-[16px]">Konfirmasi & Kirim</span>
                 <SendHorizontal className="flex size-5 shrink-0"/>
-            </Link>
+            </button>
         </div>
         <div className="w-full bg-[#EEEDF4] rounded-sm flex justify-between items-start text-start gap-2 my-5 px-3 py-3">
             <Image

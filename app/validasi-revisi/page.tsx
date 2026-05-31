@@ -7,17 +7,44 @@ import { ArrowLeft, CircleCheck, CircleX, FileText, PencilLine, SendHorizontal }
 import { useRef, useState, Suspense } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { supabase } from '@/lib/supabase';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 function ValidasiRevisiContent() {
     const searchParams = useSearchParams();
-    const nopProperti = searchParams.get('nop') || '31.71.040.003.012-0051.0';
+    const router = useRouter();
+    const nopProperti = searchParams.get('nop') || '317104000301200510';
+    const rawNop = nopProperti ? nopProperti.replace(/\D/g, '') : '';
+    
+    const storageKey = (field: string) => `validasi-revisi-${field}-${rawNop}`;
 
-    const [ttdPenilai, setTtdPenilai] = useState<string | null>(null);
+    const [ttdPenilai, setTtdPenilai] = useState<string | null>(() => {
+        if (typeof window !== 'undefined') {
+            return window.localStorage.getItem(storageKey('ttd'));
+        }
+        return null;
+    });
+    const [nilaiNjop, setNilaiNjop] = useState<string>(() => {
+        if (typeof window !== 'undefined') {
+            return window.localStorage.getItem(storageKey('nilaiNjop')) || '';
+        }
+        return '';
+    });
+    const [alasan, setAlasan] = useState<string>(() => {
+        if (typeof window !== 'undefined') {
+            return window.localStorage.getItem(storageKey('alasan')) || '';
+        }
+        return '';
+    });
     const sigCanvas = useRef<SignatureCanvas>(null);
+
+    const isFormValid = ttdPenilai !== null && nilaiNjop.trim() !== '' && alasan.trim() !== '';
 
     const clearSignature = () => {
         sigCanvas.current?.clear();
+        setTtdPenilai(null);
+        if (typeof window !== 'undefined') {
+            window.localStorage.removeItem(storageKey('ttd'));
+        }
     };
 
     const saveSignature = async () => {
@@ -29,12 +56,15 @@ function ValidasiRevisiContent() {
 
         if (base64String) {
             setTtdPenilai(base64String);
+            if (typeof window !== 'undefined') {
+                window.localStorage.setItem(storageKey('ttd'), base64String);
+            }
 
             try {
                 const { data, error } = await supabase
                     .from('decisions')
                     .upsert({
-                        nop: nopProperti,
+                        nop: rawNop,
                         ttd_url: base64String,
                         status_keputusan: 'Draf'
                     }, { onConflict: 'nop' });
@@ -43,12 +73,10 @@ function ValidasiRevisiContent() {
                     throw error;
                 }
 
-                console.log(`Tanda tangan untuk NOP ${nopProperti} berhasil disimpan di database.`);
                 alert("Tanda tangan berhasil disimpan ke sistem.");
 
-            } catch (error: any) {
-                console.error("Gagal menyimpan tanda tangan:", JSON.stringify(error, null, 2) || error.message);
-                alert("Gagal menyimpan ke database, cek koneksi internet Anda.");
+            } catch (err) {
+                console.error("Gagal menyimpan tanda tangan:", err);
             }
         }
     };
@@ -64,7 +92,7 @@ function ValidasiRevisiContent() {
       {/* Content */}
       <div className="w-[93%] mx-auto mt-4">
         <div className="w-full flex justify-start items-center gap-2">
-            <Link href="/detail-properti">
+            <Link href={`/detail-properti?nop=${rawNop || nopProperti}`}>
                 <ArrowLeft className="flex size-6 text-[#444651] shrink-0"/>
             </Link>
             <h2 className="font-mono font-bold text-[24px] text-[#1A1B21]">Validasi Keputusan</h2>
@@ -77,12 +105,12 @@ function ValidasiRevisiContent() {
             </div>
             <div className="w-full flex justify-between items-stretch gap-2 pt-4">
                 {/* Setujui */}
-                <Link href="/validasi-setuju" className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                <Link href={`/validasi-setuju?nop=${rawNop || nopProperti}`} className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
                     <CircleCheck className="flex size-5 text-[#1B6B51] shrink-0"/>
                     <span className="font-bold text-[16px] text-[#444651]">Setujui</span>
                 </Link>
                 {/* Revisi */}
-                <Link href="/validasi-revisi" className="flex-1 border-2 border-[#D0C83C] bg-[#FFF8CB] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                <Link href={`/validasi-revisi?nop=${rawNop || nopProperti}`} className="flex-1 border-2 border-[#D0C83C] bg-[#FFF8CB] rounded-sm flex flex-col justify-center items-center py-3 px-2">
                     <Image
                         src="/images/common/logo-revisi.svg"
                         alt="Logo Revisi"
@@ -93,47 +121,70 @@ function ValidasiRevisiContent() {
                     <span className="font-bold text-[16px] text-[#341100]">Revisi</span>
                 </Link>
                 {/* Tolak */}
-                <Link href="/validasi-tolak" className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
+                <Link href={`/validasi-tolak?nop=${rawNop || nopProperti}`} className="flex-1 border border-[#C5C5D3] rounded-sm flex flex-col justify-center items-center py-3 px-2">
                     <CircleX className="flex size-5 text-[#BA1A1A] shrink-0"/>
                     <span className="font-bold text-[16px] text-[#444651]">Tolak</span>
                 </Link>
             </div>
         </div>
-        {/* Nilai NJOP Baru */}
-        <div className="w-full bg-[#F4F3FA] border-2 border-[#C5C5D3] rounded-md mt-5 py-4 px-4 shadow-xs flex flex-col gap-3 border-l-4 border-l-[#6e2c01]">
-            <label htmlFor="nominal" className="flex justify-start items-center gap-1">
-                <Image
-                    src="/images/validasi-revisi/logo-uang.svg"
-                    alt="Logo Uang"
-                    width={14}
-                    height={10}
-                    className="shrink-0"
-                />
-                <h4 className="font-bold text-[14px] text-[#1A1B21]">Nilai NJOP Baru (Penyesuaian)</h4>
-                <span className="font-mono font-bold text-[11px] text-[#BA1A1A]">*</span>
-            </label>
-            <div className="w-full bg-white border border-[#C5C5D3] rounded-sm flex justify-start gap-2 px-2 py-2">
-                <span className="font-mono font-medium text-[14px] text-[#444651]">Rp</span>
-                <input id="nominal" type="text" name="nominal" inputMode="numeric" 
-                    placeholder="Masukkan nominal baru"
-                className="w-full ml-1 outline-none focus:ring-0 text-[12px] text-black placeholder:text-[#6B7280]"
-                />
-            </div>
-        </div>
-        {/* Alasan/Catatan Penilai */}
-        <div className="w-full border-2 border-[#C5C5D3] rounded-md mt-5 py-4 px-4 shadow-xs flex flex-col gap-3">
-            <div className="w-full flex justify-between">
-                <label htmlFor="alasan" className="flex justify-start items-center gap-1">
-                    <span className="font-bold text-[14px] text-[#1A1B21]">Alasan / Catatan Penilai</span>
-                    <span className="font-mono font-bold text-[11px] text-[#BA1A1A]">*</span>
-                </label>
-                <span className="text-[12px] text-[#444651]">Wajib Diisi</span>
-            </div>
-            <textarea rows={4} id="alasan" name="alasan"
-                className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
-                placeholder="Uraikan alasan revisi secara mendetail berdasarkan temuan lapangan..."
-            ></textarea>
-        </div>
+{/* Nilai NJOP Baru */}
+         <div className="w-full bg-[#F4F3FA] border-2 border-[#C5C5D3] rounded-md mt-5 py-4 px-4 shadow-xs flex flex-col gap-3 border-l-4 border-l-[#6e2c01]">
+             <label htmlFor="nominal" className="flex justify-start items-center gap-1">
+                 <Image
+                     src="/images/validasi-revisi/logo-uang.svg"
+                     alt="Logo Uang"
+                     width={14}
+                     height={10}
+                     className="shrink-0"
+                 />
+                 <h4 className="font-bold text-[14px] text-[#1A1B21]">Nilai NJOP Baru (Penyesuaian)</h4>
+                 <span className="font-mono font-bold text-[11px] text-[#BA1A1A]">*</span>
+             </label>
+             <div className="w-full bg-white border border-[#C5C5D3] rounded-sm flex justify-start gap-2 px-2 py-2">
+                 <span className="font-mono font-medium text-[14px] text-[#444651]">Rp</span>
+                 <input 
+                     id="nominal" 
+                     type="text" 
+                     name="nominal" 
+                     inputMode="numeric" 
+                     placeholder="Masukkan nominal baru"
+                     value={nilaiNjop}
+                      onChange={(e) => {
+                          const val = e.target.value;
+                          setNilaiNjop(val);
+                          if (typeof window !== 'undefined') {
+                              window.localStorage.setItem(storageKey('nilaiNjop'), val);
+                          }
+                      }}
+                     className="w-full ml-1 outline-none focus:ring-0 text-[12px] text-black placeholder:text-[#6B7280]"
+                 />
+             </div>
+         </div>
+         {/* Alasan/Catatan Penilai */}
+         <div className="w-full border-2 border-[#C5C5D3] rounded-md mt-5 py-4 px-4 shadow-xs flex flex-col gap-3">
+             <div className="w-full flex justify-between">
+                 <label htmlFor="alasan" className="flex justify-start items-center gap-1">
+                     <span className="font-bold text-[14px] text-[#1A1B21]">Alasan / Catatan Penilai</span>
+                     <span className="font-mono font-bold text-[11px] text-[#BA1A1A]">*</span>
+                 </label>
+                 <span className="text-[12px] text-[#444651]">Wajib Diisi</span>
+             </div>
+             <textarea 
+                 rows={4} 
+                 id="alasan" 
+                 name="alasan"
+                 value={alasan}
+                  onChange={(e) => {
+                      const val = e.target.value;
+                      setAlasan(val);
+                      if (typeof window !== 'undefined') {
+                          window.localStorage.setItem(storageKey('alasan'), val);
+                      }
+                  }}
+                 className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
+                 placeholder="Uraikan alasan revisi secara mendetail berdasarkan temuan lapangan..."
+             ></textarea>
+         </div>
         {/* Tanda Tangan Digital */}
         <div className="w-full border-2 border-[#C5C5D3] rounded-md mt-5 py-4 px-4 shadow-xs flex flex-col gap-2">
             <div className="flex justify-between items-center gap-2">
@@ -174,15 +225,26 @@ function ValidasiRevisiContent() {
         {/* Tombol Bawah */}
         <div className="w-full flex flex-col gap-4">
             {/* Preview Draf Berita Acara */}
-            <Link href="/berita-revisi" className="w-full border border-[#757682] rounded-lg flex justify-center items-center gap-2 text-[#1A1B21] py-3">
+            <Link href={`/berita-revisi?nop=${rawNop || nopProperti}`} className="w-full border border-[#757682] rounded-lg flex justify-center items-center gap-2 text-[#1A1B21] py-3">
                 <FileText className="flex size-5 shrink-0"/>
                 <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
             </Link>
-            {/* Konfirmasi & Kirim */}
-            <Link href="/validasi-berhasil-revisi" className="w-full bg-[#1E3A8A] rounded-lg flex justify-center items-center gap-2 text-[#90A8FF] py-3">
+{/* Konfirmasi & Kirim */}
+            <button 
+                onClick={() => {
+                    if (!isFormValid) return;
+                    router.push(`/validasi-berhasil-revisi?nop=${rawNop || nopProperti}`);
+                }}
+                disabled={!isFormValid}
+                className={`w-full rounded-lg flex justify-center items-center gap-2 py-3 transition-opacity ${
+                    isFormValid
+                        ? 'bg-[#1E3A8A] text-[#90A8FF] cursor-pointer'
+                        : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                }`}
+            >
                 <span className="font-mono font-semibold text-[16px]">Konfirmasi & Kirim</span>
                 <SendHorizontal className="flex size-5 shrink-0"/>
-            </Link>
+            </button>
         </div>
         <div className="w-full bg-[#EEEDF4] rounded-sm flex justify-between items-start text-start gap-2 my-5 px-3 py-3">
             <Image
