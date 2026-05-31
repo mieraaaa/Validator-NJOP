@@ -23,9 +23,21 @@ function ValidasiTolakContent() {
     const router = useRouter();
     const nopProperti = searchParams.get('nop') || '317104000301200510';
     const rawNop = nopProperti ? nopProperti.replace(/\D/g, '') : '';
+    
+    const storageKey = (field: string) => `validasi-tolak-${field}-${rawNop}`;
 
-    const [alasan, setAlasan] = useState<string>('');
-    const [tindakan, setTindakan] = useState<string>('');
+    const [alasan, setAlasan] = useState<string>(() => {
+        if (typeof window !== 'undefined') {
+            return window.localStorage.getItem(storageKey('alasan')) || '';
+        }
+        return '';
+    });
+    const [tindakan, setTindakan] = useState<string>(() => {
+        if (typeof window !== 'undefined') {
+            return window.localStorage.getItem(storageKey('tindakan')) || '';
+        }
+        return '';
+    });
 
     const isFormValid = alasan.trim() !== '' && tindakan.trim() !== '';
 
@@ -89,7 +101,13 @@ function ValidasiTolakContent() {
                 id="alasan" 
                 name="alasan"
                 value={alasan}
-                onChange={(e) => setAlasan(e.target.value)}
+                  onChange={(e) => {
+                      const val = e.target.value;
+                      setAlasan(val);
+                      if (typeof window !== 'undefined') {
+                          window.localStorage.setItem(storageKey('alasan'), val);
+                      }
+                  }}
                 className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
                 placeholder="Uraikan alasan penolakan secara mendetail berdasarkan peraturan atau temuan lapangan yang berlaku..."
             ></textarea>
@@ -108,7 +126,13 @@ function ValidasiTolakContent() {
                 id="tindakan" 
                 name="tindakan"
                 value={tindakan}
-                onChange={(e) => setTindakan(e.target.value)}
+                      onChange={(e) => {
+                          const val = e.target.value;
+                          setTindakan(val);
+                          if (typeof window !== 'undefined') {
+                              window.localStorage.setItem(storageKey('tindakan'), val);
+                          }
+                      }}
                 className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
                 placeholder="Uraikan langkah perbaikan atau instruksi selanjutnya untuk pemohon..."
             ></textarea>

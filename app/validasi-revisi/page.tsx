@@ -13,12 +13,28 @@ function ValidasiRevisiContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const nopProperti = searchParams.get('nop') || '317104000301200510';
-    
     const rawNop = nopProperti ? nopProperti.replace(/\D/g, '') : '';
+    
+    const storageKey = (field: string) => `validasi-revisi-${field}-${rawNop}`;
 
-    const [ttdPenilai, setTtdPenilai] = useState<string | null>(null);
-    const [nilaiNjop, setNilaiNjop] = useState<string>('');
-    const [alasan, setAlasan] = useState<string>('');
+    const [ttdPenilai, setTtdPenilai] = useState<string | null>(() => {
+        if (typeof window !== 'undefined') {
+            return window.localStorage.getItem(storageKey('ttd'));
+        }
+        return null;
+    });
+    const [nilaiNjop, setNilaiNjop] = useState<string>(() => {
+        if (typeof window !== 'undefined') {
+            return window.localStorage.getItem(storageKey('nilaiNjop')) || '';
+        }
+        return '';
+    });
+    const [alasan, setAlasan] = useState<string>(() => {
+        if (typeof window !== 'undefined') {
+            return window.localStorage.getItem(storageKey('alasan')) || '';
+        }
+        return '';
+    });
     const sigCanvas = useRef<SignatureCanvas>(null);
 
     const isFormValid = ttdPenilai !== null && nilaiNjop.trim() !== '' && alasan.trim() !== '';
@@ -26,6 +42,9 @@ function ValidasiRevisiContent() {
     const clearSignature = () => {
         sigCanvas.current?.clear();
         setTtdPenilai(null);
+        if (typeof window !== 'undefined') {
+            window.localStorage.removeItem(storageKey('ttd'));
+        }
     };
 
     const saveSignature = async () => {
@@ -37,6 +56,9 @@ function ValidasiRevisiContent() {
 
         if (base64String) {
             setTtdPenilai(base64String);
+            if (typeof window !== 'undefined') {
+                window.localStorage.setItem(storageKey('ttd'), base64String);
+            }
 
             try {
                 const { data, error } = await supabase
@@ -127,7 +149,13 @@ function ValidasiRevisiContent() {
                      inputMode="numeric" 
                      placeholder="Masukkan nominal baru"
                      value={nilaiNjop}
-                     onChange={(e) => setNilaiNjop(e.target.value)}
+                      onChange={(e) => {
+                          const val = e.target.value;
+                          setNilaiNjop(val);
+                          if (typeof window !== 'undefined') {
+                              window.localStorage.setItem(storageKey('nilaiNjop'), val);
+                          }
+                      }}
                      className="w-full ml-1 outline-none focus:ring-0 text-[12px] text-black placeholder:text-[#6B7280]"
                  />
              </div>
@@ -146,7 +174,13 @@ function ValidasiRevisiContent() {
                  id="alasan" 
                  name="alasan"
                  value={alasan}
-                 onChange={(e) => setAlasan(e.target.value)}
+                  onChange={(e) => {
+                      const val = e.target.value;
+                      setAlasan(val);
+                      if (typeof window !== 'undefined') {
+                          window.localStorage.setItem(storageKey('alasan'), val);
+                      }
+                  }}
                  className="w-full border border-[#C5C5D3] rounded-sm p-3 text-[12px] text-[#1A1B21] placeholder:text-[#6B7280] outline-none focus:ring-0 resize-none"
                  placeholder="Uraikan alasan revisi secara mendetail berdasarkan temuan lapangan..."
              ></textarea>
