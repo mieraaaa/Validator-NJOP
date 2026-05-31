@@ -10,14 +10,16 @@ import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { getCurrentUser } from '@/lib/auth';
 
 function BeritaSetujuContent() {
     const searchParams = useSearchParams();
     const nopProperti = searchParams.get('nop') || '31.71.040.003.012-0051.0';
+    const rawNop = nopProperti ? nopProperti.replace(/\D/g, '') : '';
 
     const [ttdPenilai, setTtdPenilai] = useState<string | null>(null);
-    const [namaPenilai, setNamaPenilai] = useState<string>("Memuat nama...");
-    const [nipPenilai, setNipPenilai] = useState<string>("Memuat NIP...");
+    const [user, setUser] = useState<any>(null);
+    const [isLoadingUser, setIsLoadingUser] = useState(true);
 
     useEffect(() => {
         const fetchTandaTangan = async () => {
@@ -25,11 +27,7 @@ function BeritaSetujuContent() {
                 const { data, error } = await supabase
                     .from('decisions')
                     .select(`
-                        ttd_url,
-                        users (
-                            nama,
-                            nip
-                        )
+                        ttd_url
                     `)
                     .eq('nop', nopProperti)
                     .single();
@@ -39,13 +37,6 @@ function BeritaSetujuContent() {
                 if (data) {
                     if (data.ttd_url) {
                         setTtdPenilai(data.ttd_url);
-                    }
-                    
-                    if (data.users) {
-                        const userData = Array.isArray(data.users) ? data.users[0] : data.users;
-                        
-                        setNamaPenilai(userData.nama || "Nama Tidak Ditemukan");
-                        setNipPenilai(userData.nip || "-");
                     }
                 }
             } catch (error) {
@@ -111,6 +102,60 @@ function BeritaSetujuContent() {
             alert('Gagal menyimpan PDF: ' + (error.message || 'Error tidak diketahui.'));
         }
     };
+
+    const [tanggalKeputusan, setTanggalKeputusan] = useState<string>('Memuat tanggal...');
+
+    useEffect(() => {
+        const fetchDataKeputusan = async () => {
+            if (!rawNop) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('decisions')
+                    .select(`
+                        ttd_url,
+                        detail_keputusan,
+                        created_at, 
+                        users (nama, nip)
+                    `)
+                    .eq('nop', rawNop)
+                    .single();
+
+                if (error) throw error;
+
+                if (data) {
+                    if (data.created_at) {
+                        const tglDatabase = new Date(data.created_at);
+                        const formatTanggal = tglDatabase.toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                        });
+                        setTanggalKeputusan(formatTanggal);
+                    }
+                }
+            } catch (error) {
+                console.error("Gagal menarik data keputusan final:", error);
+            }
+        };
+
+        fetchDataKeputusan();
+    }, [rawNop]);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const userData = await getCurrentUser(); 
+                setUser(userData);
+            } catch (error) {
+                console.error("Gagal menarik data user:", error);
+            } finally {
+                setIsLoadingUser(false);
+            }
+        };
+        
+        fetchUser();
+    }, []);
 
   return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc] pb-5">
@@ -180,7 +225,7 @@ function BeritaSetujuContent() {
                 </h4>
                 <span className="font-mono font-bold text-[24px] text-[#00164E]">Rp 1.450.000.000</span>
                 <p className="font-public-sans text-[12px] text-[#264191]">
-                    Berdasarkan hasil peninjauan lapangan pada tanggal 24 Oktober 2023, data fisik dan nilai 
+                    Berdasarkan hasil peninjauan lapangan pada tanggal {tanggalKeputusan}, data fisik dan nilai 
                     bangunan telah sesuai dengan kondisi faktual.
                 </p>
             </div>
@@ -219,8 +264,8 @@ function BeritaSetujuContent() {
                     )}
                 </div>
                 <hr className="border-[#444651] w-[70%] mx-auto border-t pb-1"/>
-                <span className="font-mono font-semibold text-[16px]">{namaPenilai}</span>
-                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">NIP. {nipPenilai}</span>
+                <span className="font-mono font-semibold text-[16px]">{isLoadingUser ? 'Memuat Nama...' : (user?.nama || 'Ahmad Hidayat')}</span>
+                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">{isLoadingUser ? 'Memuat NIP...' : (user?.nip ? `NIP. ${user.nip}` : 'NIP. 199203152019021001')}</span>
             </div>
         </div>
       </div>

@@ -10,14 +10,22 @@ import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { supabase } from '@/lib/supabase';
 import { useSearchParams } from 'next/navigation';
+import { getCurrentUser } from '@/lib/auth';
 
 function BeritaRevisiContent() {
     const searchParams = useSearchParams();
     const nopProperti = searchParams.get('nop') || '31.71.040.003.012-0051.0';
+    const rawNop = nopProperti ? nopProperti.replace(/\D/g, '') : '';
 
     const [ttdPenilai, setTtdPenilai] = useState<string | null>(null);
     const [namaPenilai, setNamaPenilai] = useState<string>("Memuat nama...");
     const [nipPenilai, setNipPenilai] = useState<string>("Memuat NIP...");
+    const [user, setUser] = useState<any>(null);
+    const [isLoadingUser, setIsLoadingUser] = useState(true);
+
+    const [njopLama, setNjopLama] = useState<number | string>('...');
+    const [njopBaru, setNjopBaru] = useState<string>('...');
+    const [catatanRevisi, setCatatanRevisi] = useState<string>('...');
 
     useEffect(() => {
         const fetchTandaTangan = async () => {
@@ -25,11 +33,7 @@ function BeritaRevisiContent() {
                 const { data, error } = await supabase
                     .from('decisions')
                     .select(`
-                        ttd_url,
-                        users (
-                            nama,
-                            nip
-                        )
+                        ttd_url
                     `)
                     .eq('nop', nopProperti)
                     .single();
@@ -40,13 +44,6 @@ function BeritaRevisiContent() {
                     if (data.ttd_url) {
                         setTtdPenilai(data.ttd_url);
                     }
-                    
-                    if (data.users) {
-                        const userData = Array.isArray(data.users) ? data.users[0] : data.users;
-                        
-                        setNamaPenilai(userData.nama || "Nama Tidak Ditemukan");
-                        setNipPenilai(userData.nip || "-");
-                    }
                 }
             } catch (error) {
                 console.error("Gagal menarik data lengkap:", error);
@@ -55,6 +52,21 @@ function BeritaRevisiContent() {
 
         fetchTandaTangan();
     }, [nopProperti]);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const userData = await getCurrentUser(); 
+                setUser(userData);
+            } catch (error) {
+                console.error("Gagal menarik data user:", error);
+            } finally {
+                setIsLoadingUser(false);
+            }
+        };
+        
+        fetchUser();
+    }, []);
 
     const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -111,6 +123,45 @@ function BeritaRevisiContent() {
             alert('Gagal menyimpan PDF: ' + (error.message || 'Error tidak diketahui.'));
         }
     };
+
+    const [tanggalKeputusan, setTanggalKeputusan] = useState<string>('Memuat tanggal...');
+
+    useEffect(() => {
+        const fetchDataKeputusan = async () => {
+            if (!rawNop) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('decisions')
+                    .select(`
+                        ttd_url,
+                        detail_keputusan,
+                        created_at, 
+                        users (nama, nip)
+                    `)
+                    .eq('nop', rawNop)
+                    .single();
+
+                if (error) throw error;
+
+                if (data) {
+                    if (data.created_at) {
+                        const tglDatabase = new Date(data.created_at);
+                        const formatTanggal = tglDatabase.toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                        });
+                        setTanggalKeputusan(formatTanggal);
+                    }
+                }
+            } catch (error) {
+                console.error("Gagal menarik data keputusan final:", error);
+            }
+        };
+
+        fetchDataKeputusan();
+    }, [rawNop]);
 
   return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc] pb-5">
@@ -185,11 +236,11 @@ function BeritaRevisiContent() {
                     <span className="block">Ditetapkan</span>
                 </h4>
                 <span className="font-mono font-bold text-[24px] text-[#4E4A00] flex flex-col items-center gap-1">
-                    <span className="text-[13px] line-through">Rp 1.450.000.000</span>
-                    Rp 1.500.000.000
+                    <span className="text-[13px] line-through">{typeof njopLama === 'number' ? njopLama.toLocaleString('id-ID') : njopLama}</span>
+                    {njopBaru.startsWith('Rp') ? njopBaru : `Rp ${njopBaru}`}
                 </span>
                 <p className="font-public-sans text-[12px] text-[#918526]">
-                    tanggal 24 Oktober 2023, dilakukan penyesuaian/perubahan nilai bangunan agar sesuai dengan kondisi faktual terkini.
+                    tanggal {tanggalKeputusan}, dilakukan penyesuaian/perubahan nilai bangunan agar sesuai dengan kondisi faktual terkini.
                 </p>
             </div>
         </div>
@@ -199,8 +250,8 @@ function BeritaRevisiContent() {
         </div>
         <div className="w-full bg-[#FAF8FF] border border-[#C5C5D3] px-4 py-4 font-mono flex flex-col justify-start gap-1">
             <h4 className="font-bold text-[11px] text-[#444651]">Catatan Penilai</h4>
-            <p className="font-medium text-[14px] text-[#1A1B21] flex-1 min-w-0">Terdapat penambahan luas bangunan di bagian belakang (dapur) 
-                sebesar 20m² yang belum tercatat di sistem awal, sehingga NJOP disesuaikan.
+            <p className="font-medium text-[14px] text-[#1A1B21] flex-1 min-w-0">
+                {catatanRevisi}
             </p>
         </div>
         <hr className="border-[#C5C5D3] w-full mx-auto border-t mt-8"/>
@@ -237,8 +288,8 @@ function BeritaRevisiContent() {
                     )}
                 </div>
                 <hr className="border-[#444651] w-[70%] mx-auto border-t pb-1"/>
-                <span className="font-mono font-semibold text-[16px]">{namaPenilai}</span>
-                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">NIP. {nipPenilai}</span>
+                <span className="font-mono font-semibold text-[16px]">{isLoadingUser ? 'Memuat Nama...' : (user?.nama || 'Ahmad Hidayat')}</span>
+                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">{isLoadingUser ? 'Memuat NIP...' : (user?.nip ? `NIP. ${user.nip}` : 'NIP. 199203152019021001')}</span>
             </div>
         </div>
       </div>
