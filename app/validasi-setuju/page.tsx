@@ -11,11 +11,11 @@ import { supabase } from '@/lib/supabase';
 import { useSearchParams } from 'next/navigation';
 
 function ValidasiSetujuContent() {
-    const searchParams = useSearchParams();
+const searchParams = useSearchParams();
+    // Default NOP
     const nopProperti = searchParams.get('nop') || '31.71.040.003.012-0051.0';
 
     const rawNop = nopProperti ? nopProperti.replace(/\D/g, '') : '';
-
     const formattedNop = rawNop.length == 18 ? (
         `${rawNop.substring(0, 2)}.${rawNop.substring(2, 4)}.${rawNop.substring(4, 7)}.${rawNop.substring(7, 10)}.${rawNop.substring(10, 13)}-${rawNop.substring(13, 17)}.${rawNop.substring(17, 18)}`
     ) : nopProperti;
@@ -25,23 +25,28 @@ function ValidasiSetujuContent() {
     const [namaPenilai, setNamaPenilai] = useState<string>("Memuat nama...");
     const [nipPenilai, setNipPenilai] = useState<string>("Memuat NIP...");
     
-    // State BARU untuk Data Properti (API Eksternal)
+    // State untuk Data Properti (API Eksternal)
     const [detailProperti, setDetailProperti] = useState<any>(null);
     const [luasBangunanTotal, setLuasBangunanTotal] = useState<number>(0);
     const [isLoadingData, setIsLoadingData] = useState(true);
 
     useEffect(() => {
         const fetchSemuaData = async () => {
-            if (!nopProperti) return;
+            if (!formattedNop) return;
             setIsLoadingData(true);
 
             try {
-                const nopObj = parseStringToNop(nopProperti);
+                const nopObj = parseStringToNop(formattedNop);
                 
                 const [detailData, bangunanData] = await Promise.all([
-                    fetchDetailProperti(nopObj),
-                    fetchListBangunan(nopObj).catch(() => [])
+                    fetchDetailProperti(nopObj).catch((err) => {
+                        console.error("Error API Detail:", err);
+                        return null;
+                    }),
+                    fetchListBangunan(nopObj).catch(() => ([] as any))
                 ]);
+
+                console.log("HASIL TARIK API DETAIL:", detailData);
 
                 setDetailProperti(detailData);
 
@@ -52,7 +57,7 @@ function ValidasiSetujuContent() {
                 const { data: supabaseData, error: supabaseError } = await supabase
                     .from('decisions')
                     .select('ttd_url, users (nama, nip)')
-                    .eq('nop', nopProperti)
+                    .eq('nop', formattedNop)
                     .single();
 
                 if (!supabaseError && supabaseData) {
@@ -66,14 +71,14 @@ function ValidasiSetujuContent() {
                 }
 
             } catch (error) {
-                console.error("Gagal menarik data:", error);
+                console.error("Gagal menarik data utama:", error);
             } finally {
                 setIsLoadingData(false);
             }
         };
 
         fetchSemuaData();
-    }, [nopProperti]);
+    }, [nopProperti, formattedNop]);
 
     const sigCanvas = useRef<SignatureCanvas>(null);
 
