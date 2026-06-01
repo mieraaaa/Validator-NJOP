@@ -174,7 +174,6 @@ function ValidasiTolakContent() {
                 <FileText className="flex size-5 shrink-0"/>
                 <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
             </Link>
-            {/* Konfirmasi & Kirim */}
             <button 
                 onClick={async () => {
                     if (!isFormValid) return;
@@ -182,17 +181,18 @@ function ValidasiTolakContent() {
                     try {
                         const { error } = await supabase
                             .from('decisions')
-                            .update({
+                            .insert({
+                                nop: rawNop,
                                 status_keputusan: 'Tolak',
                                 user_id: user?.id,
                                 nilai_njop_lama: detailProperti?.nilaiSistemBumi || 0,
                                 nilai_njop_final: detailProperti?.nilaiSistemBumi || 0,
                                 detail_keputusan: {
                                     alasan_penolakan: alasan,
-                                    tindakan_lanjutan: tindakan
+                                    tindakan_lanjutan: tindakan,
+                                    alamat: detailProperti?.jalanOp || "Jl. Jend. Sudirman Kav. 21"
                                 }
-                            })
-                            .eq('nop', rawNop);
+                            });
 
                         if (error) throw error;
 

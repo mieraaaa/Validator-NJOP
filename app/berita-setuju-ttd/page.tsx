@@ -30,13 +30,14 @@ function BeritaSetujuContent() {
                         ttd_url
                     `)
                     .eq('nop', nopProperti)
-                    .single();
+                    .order('created_at', { ascending: false })
+                    .limit(1);
 
                 if (error) throw error;
 
-                if (data) {
-                    if (data.ttd_url) {
-                        setTtdPenilai(data.ttd_url);
+                if (data && data.length > 0) {
+                    if (data[0].ttd_url) {
+                        setTtdPenilai(data[0].ttd_url);
                     }
                 }
             } catch (error) {
@@ -119,13 +120,15 @@ function BeritaSetujuContent() {
                         users (nama, nip)
                     `)
                     .eq('nop', rawNop)
-                    .single();
+                    .order('created_at', { ascending: false })
+                    .limit(1);
 
                 if (error) throw error;
 
-                if (data) {
-                    if (data.created_at) {
-                        const tglDatabase = new Date(data.created_at);
+                if (data && data.length > 0) {
+                    const latest = data[0];
+                    if (latest.created_at) {
+                        const tglDatabase = new Date(latest.created_at);
                         const formatTanggal = tglDatabase.toLocaleDateString('id-ID', {
                             day: 'numeric',
                             month: 'long',

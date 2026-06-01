@@ -36,6 +36,20 @@ function ValidasiSetujuContent() {
     const isFormValid = ttdPenilai !== null && !isLoadingData;
 
     useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const userData = await getCurrentUser();
+                setUser(userData);
+            } catch (error) {
+                console.error("Gagal menarik data user:", error);
+            } finally {
+                setIsLoadingUser(false);
+            }
+        };
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
         const fetchSemuaData = async () => {
             if (!rawNop || rawNop.length !== 18) return;
             setIsLoadingData(true);
@@ -71,13 +85,15 @@ function ValidasiSetujuContent() {
                     .from('decisions')
                     .select('ttd_url, users (nama, nip)')
                     .eq('nop', rawNop)
-                    .single();
+                    .order('created_at', { ascending: false })
+                    .limit(1);
 
-                if (!supabaseError && supabaseData) {
-                    if (supabaseData.ttd_url) setTtdPenilai(supabaseData.ttd_url);
+                if (!supabaseError && supabaseData && supabaseData.length > 0) {
+                    const latest = supabaseData[0];
+                    if (latest.ttd_url) setTtdPenilai(latest.ttd_url);
                     
-                    if (supabaseData.users) {
-                        const userData = Array.isArray(supabaseData.users) ? supabaseData.users[0] : supabaseData.users;
+                    if (latest.users) {
+                        const userData = Array.isArray(latest.users) ? latest.users[0] : latest.users;
                         setNamaPenilai(userData.nama || "Nama Tidak Ditemukan");
                         setNipPenilai(userData.nip || "-");
                     }
@@ -109,25 +125,7 @@ function ValidasiSetujuContent() {
 
         if (base64String) {
             setTtdPenilai(base64String);
-
-            try {
-                const { data, error } = await supabase
-                    .from('decisions')
-                    .upsert({
-                        nop: rawNop,
-                        ttd_url: base64String,
-                        status_keputusan: 'Disetujui'
-                    }, { onConflict: 'nop' });
-
-                if (error) {
-                    throw error;
-                }
-
-                alert("Tanda tangan berhasil disimpan ke sistem.");
-
-            } catch (err) {
-                console.error("Gagal menyimpan tanda tangan:", err);
-            }
+            alert("Tanda tangan berhasil disimpan ke sistem.");
         }
     };
    
@@ -259,16 +257,18 @@ function ValidasiSetujuContent() {
                     try {
                         const { error } = await supabase
                             .from('decisions')
-                            .update({
+                            .insert({
+                                nop: rawNop,
                                 status_keputusan: 'Setuju',
                                 user_id: user?.id,
                                 nilai_njop_lama: detailProperti?.nilaiSistemBumi || 0,
                                 nilai_njop_final: detailProperti?.nilaiSistemBumi || 0,
+                                ttd_url: ttdPenilai,
                                 detail_keputusan: {
-                                    catatan: "Sesuai dengan kondisi faktual di lapangan."
+                                    catatan: "Sesuai dengan kondisi faktual di lapangan.",
+                                    alamat: detailProperti?.jalanOp || "Jl. Jend. Sudirman Kav. 21"
                                 }
-                            })
-                            .eq('nop', rawNop);
+                            });
 
                         if (error) throw error;
 

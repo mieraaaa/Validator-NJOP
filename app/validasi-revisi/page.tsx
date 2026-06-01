@@ -67,25 +67,7 @@ function ValidasiRevisiContent() {
             if (typeof window !== 'undefined') {
                 window.localStorage.setItem(storageKey('ttd'), base64String);
             }
-
-            try {
-                const { data, error } = await supabase
-                    .from('decisions')
-                    .upsert({
-                        nop: rawNop,
-                        ttd_url: base64String,
-                        status_keputusan: 'Draf'
-                    }, { onConflict: 'nop' });
-
-                if (error) {
-                    throw error;
-                }
-
-                alert("Tanda tangan berhasil disimpan ke sistem.");
-
-            } catch (err) {
-                console.error("Gagal menyimpan tanda tangan:", err);
-            }
+            alert("Tanda tangan berhasil disimpan ke sistem.");
         }
     };
   
@@ -266,16 +248,18 @@ function ValidasiRevisiContent() {
 
                         const { error } = await supabase
                             .from('decisions')
-                            .update({
+                            .insert({
+                                nop: rawNop,
                                 status_keputusan: 'Revisi',
                                 user_id: user?.id,
                                 nilai_njop_lama: detailProperti?.nilaiSistemBumi || 0,
                                 nilai_njop_final: nilaiFinalAngka,
+                                ttd_url: ttdPenilai,
                                 detail_keputusan: {
-                                    catatan_penilai: alasan
+                                    catatan_penilai: alasan,
+                                    alamat: detailProperti?.jalanOp || "Jl. Jend. Sudirman Kav. 21"
                                 }
-                            })
-                            .eq('nop', rawNop);
+                            });
 
                         if (error) throw error;
 
