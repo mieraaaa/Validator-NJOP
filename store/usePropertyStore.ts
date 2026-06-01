@@ -18,10 +18,12 @@ interface PropertyStore {
   isLoading: boolean;
   error: string | null;
   searchQuery: string;
+  selectedProperty: any | null;
   
   // Actions
   fetchAntrean: () => Promise<void>;
   setSearchQuery: (query: string) => void;
+  setSelectedProperty: (property: any | null) => void;
 }
 
 function generateMockMetadata(nopStr: string) {
@@ -58,6 +60,9 @@ export const usePropertyStore = create<PropertyStore>((set, get) => ({
   isLoading: false,
   error: null,
   searchQuery: '',
+
+  selectedProperty: null,
+  setSelectedProperty: (property) => set({ selectedProperty: property }),
 
   fetchAntrean: async () => {
     set({ isLoading: true, error: null });

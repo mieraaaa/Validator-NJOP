@@ -6,10 +6,12 @@ import { ArrowLeft, MapPin, Images, ArrowRight, TrendingUp, TrendingDown, Minus,
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from "react";
 import { fetchDetailProperti, parseStringToNop, fetchListBangunan, fetchSpptHistory, fetchListAntrean, formatNopToString } from "@/lib/api";
+import { usePropertyStore } from "@/store/usePropertyStore";
 
 function DetailPropertiContent() {
     const searchParams = useSearchParams();
     const nopParam = searchParams.get('nop');
+    const setSelectedProperty = usePropertyStore((state) => state.setSelectedProperty);
 
     const [detail, setDetail] = useState<any>(null);
     const [bangunan, setBangunan] = useState<any>(null);
@@ -48,6 +50,21 @@ function DetailPropertiContent() {
                 setHistory({ rows: Array.isArray(historyData) ? historyData : [] });
                 setKomparasi({ rows: sameKelurahanRows });
 
+                const rawNop = nopParam ? nopParam.replace(/\D/g, '') : '';
+                const totalLuasBangunanVal = (Array.isArray(bangunanData) ? bangunanData : ((bangunanData as any)?.rows || [])).reduce((acc: number, cur: any) => acc + (cur.luasBng || 0), 0);
+                const propertyData = {
+                    nop: rawNop,
+                    jalanOp: detailData?.jalanOp || "Alamat tidak tersedia",
+                    luasBumi: detailData?.luasBumi || 0,
+                    nilaiSistemBumi: detailData?.njopBumi || detailData?.nilaiSistemBumi || 0,
+                    totalLuasBangunan: totalLuasBangunanVal,
+                    jnsBumi: detailData?.jnsBumi || '1'
+                };
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem(`property-detail-${rawNop}`, JSON.stringify(propertyData));
+                }
+                setSelectedProperty(propertyData);
+
                 setLoading(false);
             } catch (err: any) {
                 setError(err.message);
@@ -55,7 +72,7 @@ function DetailPropertiContent() {
             }
         }
         loadData();
-    }, [nopParam]);
+    }, [nopParam, setSelectedProperty]);
 
     const formattedNop = nopParam ? (
         `${nopParam.substring(0, 2)}.${nopParam.substring(2, 4)}.${nopParam.substring(4, 7)}.${nopParam.substring(7, 10)}.${nopParam.substring(10, 13)}-${nopParam.substring(13, 17)}.${nopParam.substring(17, 18)}`

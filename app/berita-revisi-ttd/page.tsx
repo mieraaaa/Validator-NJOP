@@ -27,6 +27,19 @@ function BeritaRevisiContent() {
     const [njopBaru, setNjopBaru] = useState<string>('...');
     const [catatanRevisi, setCatatanRevisi] = useState<string>('...');
 
+    const [alamat, setAlamat] = useState<string>('Memuat alamat...');
+    const [luasBumi, setLuasBumi] = useState<number | string>('...');
+    const [luasBangunan, setLuasBangunan] = useState<number | string>('...');
+
+    const formatNop = (raw: string) => {
+        if (!raw) return "-";
+        const clean = raw.replace(/\D/g, '');
+        if (clean.length === 18) {
+            return `${clean.substring(0, 2)}.${clean.substring(2, 4)}.${clean.substring(4, 7)}.${clean.substring(7, 10)}.${clean.substring(10, 13)}-${clean.substring(13, 17)}.${clean.substring(17, 18)}`;
+        }
+        return raw;
+    };
+
     useEffect(() => {
         const fetchTandaTangan = async () => {
             try {
@@ -35,7 +48,7 @@ function BeritaRevisiContent() {
                     .select(`
                         ttd_url
                     `)
-                    .eq('nop', nopProperti)
+                    .eq('nop', rawNop)
                     .order('created_at', { ascending: false })
                     .limit(1);
 
@@ -52,7 +65,7 @@ function BeritaRevisiContent() {
         };
 
         fetchTandaTangan();
-    }, [nopProperti]);
+    }, [rawNop]);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -166,6 +179,10 @@ function BeritaRevisiContent() {
                         setNjopBaru(latest.nilai_njop_final.toLocaleString('id-ID'));
                     }
                     const detail = latest.detail_keputusan || {};
+                    setAlamat(detail.alamat || "Alamat tidak tersedia");
+                    setLuasBumi(detail.luas_tanah !== undefined ? detail.luas_tanah : '...');
+                    setLuasBangunan(detail.luas_bangunan !== undefined ? detail.luas_bangunan : '...');
+                    
                     const alasanVal = detail.catatan_penilai || detail.alasan || detail.catatan || '...';
                     setCatatanRevisi(alasanVal);
                 }
@@ -215,19 +232,19 @@ function BeritaRevisiContent() {
         <div className="w-full border border-[#C5C5D3] bg-[#FAF8FF] flex flex-col gap-5 items-center py-4 px-4">
             <div className="w-full flex flex-col gap-1 font-mono">
                 <h4 className="font-bold text-[11px] text-[#444651]">Nomor Objek Pajak (NOP)</h4>
-                <span className="font-medium text-[14px] text-[#1A1B21] break-all">32.73.040.001.012-0043.0</span>
+                <span className="font-medium text-[14px] text-[#1A1B21] break-all">{formatNop(rawNop || nopProperti)}</span>
             </div>
             <div className="w-full flex flex-col gap-1">
                 <h4 className="font-mono font-bold text-[11px] text-[#444651]">Alamat Objek Pajak</h4>
-                <span className="font-public-sans text-[14px] text-[#1A1B21] leading-tight">Jl. Merdeka Barat No. 14, RT 02 / RW 05, Kel. Sukamaju, Kec. Jatinegara</span>
+                <span className="font-public-sans text-[14px] text-[#1A1B21] leading-tight">{alamat}</span>
             </div>
             <div className="w-full flex flex-col gap-1 font-mono">
                 <h4 className="font-bold text-[11px] text-[#444651]">Luas Bumi (M²)</h4>
-                <span className="font-medium text-[14px] text-[#1A1B21]">450</span>
+                <span className="font-medium text-[14px] text-[#1A1B21]">{luasBumi}</span>
             </div>
             <div className="w-full flex flex-col gap-1 font-mono">
                 <h4 className="font-bold text-[11px] text-[#444651]">Luas Bangunan (M²)</h4>
-                <span className="font-medium text-[14px] text-[#1A1B21]">210</span>
+                <span className="font-medium text-[14px] text-[#1A1B21]">{luasBangunan}</span>
             </div>
         </div>
         {/* Hasil Validasi NJOP */}

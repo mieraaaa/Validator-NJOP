@@ -33,6 +33,30 @@ function ValidasiSetujuContent() {
     const [luasBangunanTotal, setLuasBangunanTotal] = useState<number>(0);
     const [isLoadingData, setIsLoadingData] = useState(true);
 
+    const totalNilaiVal = detailProperti?.nilaiSistemBumi || 0;
+    const njopPerM2Val = detailProperti?.luasBumi ? Math.round(totalNilaiVal / detailProperti.luasBumi) : 0;
+
+    const getFormattedParts = (val: number) => {
+        if (val >= 1_000_000_000) {
+            return {
+                value: `Rp ${(val / 1_000_000_000).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                unit: 'Miliar'
+            };
+        }
+        if (val >= 1_000_000) {
+            return {
+                value: `Rp ${(val / 1_000_000).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                unit: 'Juta'
+            };
+        }
+        return {
+            value: `Rp ${val.toLocaleString('id-ID')}`,
+            unit: ''
+        };
+    };
+    
+    const parts = getFormattedParts(totalNilaiVal);
+
     const isFormValid = ttdPenilai !== null && !isLoadingData;
 
     useEffect(() => {
@@ -55,30 +79,54 @@ function ValidasiSetujuContent() {
             setIsLoadingData(true);
 
             try {
-                const nopObj = {
-                    kdPropinsi: rawNop.substring(0, 2),
-                    kdDati2: rawNop.substring(2, 4),
-                    kdKecamatan: rawNop.substring(4, 7),
-                    kdKelurahan: rawNop.substring(7, 10),
-                    kdBlok: rawNop.substring(10, 13),
-                    noUrut: rawNop.substring(13, 17),
-                    kdJnsOp: rawNop.substring(17, 18),
-                };
-                
-                const [detailData, bangunanData] = await Promise.all([
-                    fetchDetailProperti(nopObj).catch((err) => {
-                        console.error("Error API Detail:", err);
-                        return null;
-                    }),
-                    fetchListBangunan(nopObj).catch(() => ([] as any))
-                ]);
+                let localData: any = null;
+                if (typeof window !== 'undefined') {
+                    const stored = localStorage.getItem(`property-detail-${rawNop}`);
+                    if (stored) {
+                        try {
+                            localData = JSON.parse(stored);
+                        } catch (e) {
+                            console.error("Failed to parse stored property data", e);
+                        }
+                    }
+                }
 
-                console.log("HASIL TARIK API DETAIL:", detailData);
+                let detailData = null;
+                let totalLuas = 0;
+
+                if (localData && localData.nop === rawNop && localData.nilaiSistemBumi) {
+                    detailData = {
+                        jalanOp: localData.jalanOp,
+                        luasBumi: localData.luasBumi,
+                        nilaiSistemBumi: localData.nilaiSistemBumi,
+                        jnsBumi: localData.jnsBumi
+                    };
+                    totalLuas = localData.totalLuasBangunan || 0;
+                } else {
+                    const nopObj = {
+                        kdPropinsi: rawNop.substring(0, 2),
+                        kdDati2: rawNop.substring(2, 4),
+                        kdKecamatan: rawNop.substring(4, 7),
+                        kdKelurahan: rawNop.substring(7, 10),
+                        kdBlok: rawNop.substring(10, 13),
+                        noUrut: rawNop.substring(13, 17),
+                        kdJnsOp: rawNop.substring(17, 18),
+                    };
+                    
+                    const [apiDetail, apiBangunan] = await Promise.all([
+                        fetchDetailProperti(nopObj).catch((err) => {
+                            console.error("Error API Detail:", err);
+                            return null;
+                        }),
+                        fetchListBangunan(nopObj).catch(() => ([] as any))
+                    ]);
+
+                    detailData = apiDetail;
+                    const bngList = Array.isArray(apiBangunan) ? apiBangunan : ((apiBangunan as any)?.rows || []);
+                    totalLuas = bngList.reduce((acc: number, cur: any) => acc + (cur.luasBng || 0), 0);
+                }
 
                 setDetailProperti(detailData);
-
-                const bngList = Array.isArray(bangunanData) ? bangunanData : ((bangunanData as any)?.rows || []);
-                const totalLuas = bngList.reduce((acc: number, cur: any) => acc + (cur.luasBng || 0), 0);
                 setLuasBangunanTotal(totalLuas);
 
                 const { data: supabaseData, error: supabaseError } = await supabase
@@ -107,7 +155,7 @@ function ValidasiSetujuContent() {
         };
 
         fetchSemuaData();
-    }, [nopProperti]);
+    }, [nopProperti, rawNop]);
 
     const sigCanvas = useRef<SignatureCanvas>(null);
 
@@ -193,14 +241,15 @@ function ValidasiSetujuContent() {
                 <div className="flex flex-col gap-1 justify-start font-bold flex-1 min-w-0">
                     <h4 className="text-[14px] text-[#44474F] leading-tight">NJOP yang Disetujui</h4>
                     <div className="text-[#00236F] leading-tight tracking-tight">
-                        <span className="text-[20px] whitespace-nowrap">Rp {isLoadingData ? '...' : (detailProperti?.njopBumi?.toLocaleString('id-ID') || 0)}</span>
+                        <span className="text-[20px] whitespace-nowrap">Rp {isLoadingData ? '...' : njopPerM2Val.toLocaleString('id-ID')}</span>
                         <span className="block text-[20px]"> / m² </span>
                     </div>
                 </div>
                 <div className="flex flex-col gap-1 text-right items-end font-bold flex-1 min-w-0">
                     <h4 className="text-[14px] text-[#44474F] leading-tight">Total Nilai</h4>
-                    <span className="text-[20px] text-[#00236F] leading-tight tracking-tight">Rp 3,10 
-                        <span className="block">Miliar</span>
+                    <span className="text-[20px] text-[#00236F] leading-tight tracking-tight">
+                        {isLoadingData ? '...' : parts.value}
+                        {!isLoadingData && parts.unit && <span className="block">{parts.unit}</span>}
                     </span>
                 </div>
             </div>
@@ -266,7 +315,12 @@ function ValidasiSetujuContent() {
                                 ttd_url: ttdPenilai,
                                 detail_keputusan: {
                                     catatan: "Sesuai dengan kondisi faktual di lapangan.",
-                                    alamat: detailProperti?.jalanOp || "Jl. Jend. Sudirman Kav. 21"
+                                    alamat: detailProperti?.jalanOp || "Alamat tidak tersedia",
+                                    luas_tanah: detailProperti?.luasBumi || 0,
+                                    luas_bangunan: luasBangunanTotal,
+                                    nilai_estimasi_njop: detailProperti?.nilaiSistemBumi || 0,
+                                    njop_per_m2: njopPerM2Val,
+                                    zonasi: detailProperti?.jnsBumi === '1' ? 'Perumahan' : (detailProperti?.jnsBumi === '2' ? 'Komersial' : 'Lainnya')
                                 }
                             });
 

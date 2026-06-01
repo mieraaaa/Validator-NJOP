@@ -102,6 +102,10 @@ function BeritaTolakContent() {
         fetchUser();
     }, []);
 
+    const [alamat, setAlamat] = useState<string>('Memuat alamat...');
+    const [luasBumi, setLuasBumi] = useState<number | string>('...');
+    const [luasBangunan, setLuasBangunan] = useState<number | string>('...');
+
     useEffect(() => {
         const fetchDataKeputusan = async () => {
             if (!rawNop) return;
@@ -132,6 +136,9 @@ function BeritaTolakContent() {
                         setTanggalKeputusan(formatTanggal);
                     }
                     const detail = latest.detail_keputusan || {};
+                    setAlamat(detail.alamat || "Alamat tidak tersedia");
+                    setLuasBumi(detail.luas_tanah !== undefined ? detail.luas_tanah : '...');
+                    setLuasBangunan(detail.luas_bangunan !== undefined ? detail.luas_bangunan : '...');
                     setAlasanPenolakan(detail.alasan_penolakan || detail.alasan || '...');
                     setTindakanLanjutan(detail.tindakan_lanjutan || '...');
                 }
@@ -188,16 +195,16 @@ function BeritaTolakContent() {
                     <div className="w-full flex flex-col gap-1">
                         <h4 className="font-mono font-bold text-[11px] text-[#444651]">Alamat Objek Pajak</h4>
                         <span className="font-public-sans text-[14px] text-[#1A1B21] leading-tight">
-                            Jl. Jend. Sudirman Kav. 21
+                            {alamat}
                         </span>
                     </div>
                     <div className="w-full flex flex-col gap-1 font-mono">
                         <h4 className="font-bold text-[11px] text-[#444651]">Luas Bumi (M²)</h4>
-                        <span className="font-medium text-[14px] text-[#1A1B21]">450</span>
+                        <span className="font-medium text-[14px] text-[#1A1B21]">{luasBumi}</span>
                     </div>
                     <div className="w-full flex flex-col gap-1 font-mono">
                         <h4 className="font-bold text-[11px] text-[#444651]">Luas Bangunan (M²)</h4>
-                        <span className="font-medium text-[14px] text-[#1A1B21]">210</span>
+                        <span className="font-medium text-[14px] text-[#1A1B21]">{luasBangunan}</span>
                     </div>
                 </div>
 
