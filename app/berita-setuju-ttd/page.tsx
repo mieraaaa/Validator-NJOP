@@ -29,14 +29,15 @@ function BeritaSetujuContent() {
                     .select(`
                         ttd_url
                     `)
-                    .eq('nop', nopProperti)
-                    .single();
+                    .eq('nop', rawNop)
+                    .order('created_at', { ascending: false })
+                    .limit(1);
 
                 if (error) throw error;
 
-                if (data) {
-                    if (data.ttd_url) {
-                        setTtdPenilai(data.ttd_url);
+                if (data && data.length > 0) {
+                    if (data[0].ttd_url) {
+                        setTtdPenilai(data[0].ttd_url);
                     }
                 }
             } catch (error) {
@@ -45,7 +46,7 @@ function BeritaSetujuContent() {
         };
 
         fetchTandaTangan();
-    }, [nopProperti]);
+    }, [rawNop]);
 
     const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -104,6 +105,19 @@ function BeritaSetujuContent() {
     };
 
     const [tanggalKeputusan, setTanggalKeputusan] = useState<string>('Memuat tanggal...');
+    const [alamat, setAlamat] = useState<string>('Memuat alamat...');
+    const [luasBumi, setLuasBumi] = useState<number | string>('...');
+    const [luasBangunan, setLuasBangunan] = useState<number | string>('...');
+    const [nilaiFinal, setNilaiFinal] = useState<number | string>('...');
+
+    const formatNop = (raw: string) => {
+        if (!raw) return "-";
+        const clean = raw.replace(/\D/g, '');
+        if (clean.length === 18) {
+            return `${clean.substring(0, 2)}.${clean.substring(2, 4)}.${clean.substring(4, 7)}.${clean.substring(7, 10)}.${clean.substring(10, 13)}-${clean.substring(13, 17)}.${clean.substring(17, 18)}`;
+        }
+        return raw;
+    };
 
     useEffect(() => {
         const fetchDataKeputusan = async () => {
@@ -116,16 +130,20 @@ function BeritaSetujuContent() {
                         ttd_url,
                         detail_keputusan,
                         created_at, 
+                        nilai_njop_final,
+                        nilai_njop_lama,
                         users (nama, nip)
                     `)
                     .eq('nop', rawNop)
-                    .single();
+                    .order('created_at', { ascending: false })
+                    .limit(1);
 
                 if (error) throw error;
 
-                if (data) {
-                    if (data.created_at) {
-                        const tglDatabase = new Date(data.created_at);
+                if (data && data.length > 0) {
+                    const latest = data[0];
+                    if (latest.created_at) {
+                        const tglDatabase = new Date(latest.created_at);
                         const formatTanggal = tglDatabase.toLocaleDateString('id-ID', {
                             day: 'numeric',
                             month: 'long',
@@ -133,6 +151,15 @@ function BeritaSetujuContent() {
                         });
                         setTanggalKeputusan(formatTanggal);
                     }
+                    const detail = latest.detail_keputusan || {};
+                    setAlamat(detail.alamat || "Alamat tidak tersedia");
+                    setLuasBumi(detail.luas_tanah !== undefined ? detail.luas_tanah : '...');
+                    setLuasBangunan(detail.luas_bangunan !== undefined ? detail.luas_bangunan : '...');
+                    
+                    const finalVal = (latest.nilai_njop_final !== undefined && latest.nilai_njop_final !== null && latest.nilai_njop_final !== 0)
+                        ? latest.nilai_njop_final
+                        : (latest.nilai_njop_lama || detail.nilai_estimasi_njop || 0);
+                    setNilaiFinal(finalVal);
                 }
             } catch (error) {
                 console.error("Gagal menarik data keputusan final:", error);
@@ -195,19 +222,19 @@ function BeritaSetujuContent() {
         <div className="w-full border border-[#C5C5D3] bg-[#FAF8FF] flex flex-col gap-5 items-center py-4 px-4">
             <div className="w-full flex flex-col gap-1 font-mono">
                 <h4 className="font-bold text-[11px] text-[#444651]">Nomor Objek Pajak (NOP)</h4>
-                <span className="font-medium text-[14px] text-[#1A1B21] break-all">32.73.040.001.012-0043.0</span>
+                <span className="font-medium text-[14px] text-[#1A1B21] break-all">{formatNop(rawNop || nopProperti)}</span>
             </div>
             <div className="w-full flex flex-col gap-1">
                 <h4 className="font-mono font-bold text-[11px] text-[#444651]">Alamat Objek Pajak</h4>
-                <span className="font-public-sans text-[14px] text-[#1A1B21] leading-tight">Jl. Merdeka Barat No. 14, RT 02 / RW 05, Kel. Sukamaju, Kec. Jatinegara</span>
+                <span className="font-public-sans text-[14px] text-[#1A1B21] leading-tight">{alamat}</span>
             </div>
             <div className="w-full flex flex-col gap-1 font-mono">
                 <h4 className="font-bold text-[11px] text-[#444651]">Luas Bumi (M²)</h4>
-                <span className="font-medium text-[14px] text-[#1A1B21]">450</span>
+                <span className="font-medium text-[14px] text-[#1A1B21]">{luasBumi}</span>
             </div>
             <div className="w-full flex flex-col gap-1 font-mono">
                 <h4 className="font-bold text-[11px] text-[#444651]">Luas Bangunan (M²)</h4>
-                <span className="font-medium text-[14px] text-[#1A1B21]">210</span>
+                <span className="font-medium text-[14px] text-[#1A1B21]">{luasBangunan}</span>
             </div>
         </div>
         {/* Hasil Validasi NJOP */}
@@ -223,7 +250,7 @@ function BeritaSetujuContent() {
                 <h4 className="font-public-sans text-[14px] text-[#264191]">Nilai Jual Objek Pajak (NJOP) 
                     <span className="block">Ditetapkan</span>
                 </h4>
-                <span className="font-mono font-bold text-[24px] text-[#00164E]">Rp 1.450.000.000</span>
+                <span className="font-mono font-bold text-[24px] text-[#00164E]">Rp {typeof nilaiFinal === 'number' ? nilaiFinal.toLocaleString('id-ID') : nilaiFinal}</span>
                 <p className="font-public-sans text-[12px] text-[#264191]">
                     Berdasarkan hasil peninjauan lapangan pada tanggal {tanggalKeputusan}, data fisik dan nilai 
                     bangunan telah sesuai dengan kondisi faktual.

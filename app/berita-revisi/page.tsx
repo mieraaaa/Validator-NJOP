@@ -94,7 +94,7 @@ export default function Home() {
 
       {/* Header */}
       <header className="bg-[#FAF8FF] w-full h-[57px] sticky top-0 z-50 flex justify-between items-center border-b border-[#C5C5D3] shadow-xs pl-6 pr-3">
-        <Link href="/validasi-revisi" className="w-full flex justify-start items-center text-[#00236F] gap-1">
+        <Link href={`/validasi-revisi?nop=${nopParam}`} className="w-full flex justify-start items-center text-[#00236F] gap-1">
             <ArrowLeft className="flex size-5 shrink-0"/>
             <h1 className="font-mono font-semibold text-[16px]">Kembali</h1>
         </Link>
@@ -183,7 +183,10 @@ export default function Home() {
                     ) : (
                         <>
                             <span className="text-[13px] line-through">Rp {detailProperti?.nilaiSistemBumi?.toLocaleString('id-ID')}</span>
-                            <span>Rp {njopBaru}</span>
+                            <span>{(() => {
+                                const parsed = parseInt(njopBaru.replace(/\D/g, ''), 10);
+                                return isNaN(parsed) ? 'Rp ...' : `Rp ${parsed.toLocaleString('id-ID')}`;
+                            })()}</span>
                         </>
                     )}
                 </span>

@@ -5,15 +5,42 @@ import Link from 'next/link';
 import { Search, CircleAlert, Clock, MapPin, ArrowRight, History, User } from 'lucide-react';
 import { useEffect, useState } from "react";
 import { usePropertyStore } from "@/store/usePropertyStore";
+import { supabase } from "@/lib/supabase";
 
 export default function AntreanProperti() {
   const { antrean, isLoading, error, searchQuery, setSearchQuery, fetchAntrean } = usePropertyStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<'Terbaru' | 'Prioritas'>('Terbaru');
 
+  const [validatedNops, setValidatedNops] = useState<Set<string>>(new Set());
+  const [isLoadingDecisions, setIsLoadingDecisions] = useState<boolean>(true);
+
   useEffect(() => {
     fetchAntrean();
   }, [fetchAntrean]);
+
+  useEffect(() => {
+    const fetchValidatedNops = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('decisions')
+          .select('nop');
+        if (!error && data) {
+          const normalizedNops = new Set<string>(
+            data.map((item: any) => (item.nop || '').replace(/\D/g, ''))
+          );
+          setValidatedNops(normalizedNops);
+        }
+      } catch (err) {
+        console.error("Gagal menarik data keputusan:", err);
+      } finally {
+        setIsLoadingDecisions(false);
+      }
+    };
+    fetchValidatedNops();
+  }, []);
+
+  const isPageLoading = isLoading || isLoadingDecisions;
 
   // Reset pagination on search or sort change
   useEffect(() => {
@@ -22,7 +49,14 @@ export default function AntreanProperti() {
 
   // Derived States
   const searchLower = searchQuery.toLowerCase();
-  const searchedAntrean = antrean.filter(item => 
+  
+  // Filter out any properties whose NOP exists in decisions
+  const unvalidatedAntrean = antrean.filter(item => {
+    const cleanNop = (item.nopString || '').replace(/\D/g, '');
+    return !validatedNops.has(cleanNop);
+  });
+
+  const searchedAntrean = unvalidatedAntrean.filter(item => 
     item.nopString.toLowerCase().includes(searchLower) ||
     item.jalanOp.toLowerCase().includes(searchLower)
   );
@@ -44,7 +78,7 @@ export default function AntreanProperti() {
   const totalPages = Math.ceil(sortedAntrean.length / ITEMS_PER_PAGE) || 1;
   const displayAntrean = sortedAntrean.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  const urgentCount = antrean.filter(p => p.priority === 'High').length;
+  const urgentCount = unvalidatedAntrean.filter(p => p.priority === 'High').length;
 
   return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc] pb-28">
@@ -63,7 +97,7 @@ export default function AntreanProperti() {
                 <p className="font-bold text-[12px] text-[#444651]">TOTAL ANTRIAN</p>
                 <div className="flex items-center gap-1">
                     <span className="font-mono font-semibold text-[20px] text-[#00236F]">
-                        {isLoading ? "..." : antrean.length}
+                        {isPageLoading ? "..." : unvalidatedAntrean.length}
                     </span>
                     <p className="text-[14px] text-[#444651]">Properti</p>
                 </div>
@@ -72,7 +106,7 @@ export default function AntreanProperti() {
                 <p className="font-bold text-[12px] text-[#444651]">PERLU PERHATIAN</p>
                 <div className="flex items-center gap-1">
                     <span className="font-mono font-semibold text-[20px] text-[#BA1A1A]">
-                        {isLoading ? "..." : urgentCount}
+                        {isPageLoading ? "..." : urgentCount}
                     </span>
                     <p className="text-[14px] text-[#444651]">Urgent</p>
                 </div>
@@ -118,14 +152,14 @@ export default function AntreanProperti() {
         )}
 
         {/* Loading State */}
-        {isLoading && (
+        {isPageLoading && (
             <div className="flex justify-center my-10">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00236F]"></div>
             </div>
         )}
 
         {/* List Properti */}
-        {!isLoading && !error && (
+        {!isPageLoading && !error && (
             <div className="w-full flex flex-col gap-3">
                 {displayAntrean.length === 0 ? (
                     <div className="text-center py-10 text-[#757682]">Tidak ada antrean properti.</div>
@@ -179,7 +213,7 @@ export default function AntreanProperti() {
         )}
 
         {/* Pagination UI */}
-        {!isLoading && !error && displayAntrean.length > 0 && (
+        {!isPageLoading && !error && displayAntrean.length > 0 && (
             <div className="flex justify-between items-center mt-5 mb-6">
                 <button 
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}

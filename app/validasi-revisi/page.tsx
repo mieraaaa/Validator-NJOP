@@ -8,7 +8,7 @@ import { useRef, useState, Suspense, useEffect } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { supabase } from '@/lib/supabase';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { fetchDetailProperti, parseStringToNop } from "@/lib/api";
+import { fetchDetailProperti, parseStringToNop, fetchListBangunan } from "@/lib/api";
 import { getCurrentUser } from '@/lib/auth';
 
 function ValidasiRevisiContent() {
@@ -44,6 +44,7 @@ function ValidasiRevisiContent() {
     ) : nopProperti;
 
     const [detailProperti, setDetailProperti] = useState<any>(null);
+    const [luasBangunanTotal, setLuasBangunanTotal] = useState<number>(0);
 
     const isFormValid = ttdPenilai !== null && nilaiNjop.trim() !== '' && alasan.trim() !== '';
 
@@ -67,25 +68,7 @@ function ValidasiRevisiContent() {
             if (typeof window !== 'undefined') {
                 window.localStorage.setItem(storageKey('ttd'), base64String);
             }
-
-            try {
-                const { data, error } = await supabase
-                    .from('decisions')
-                    .upsert({
-                        nop: rawNop,
-                        ttd_url: base64String,
-                        status_keputusan: 'Draf'
-                    }, { onConflict: 'nop' });
-
-                if (error) {
-                    throw error;
-                }
-
-                alert("Tanda tangan berhasil disimpan ke sistem.");
-
-            } catch (err) {
-                console.error("Gagal menyimpan tanda tangan:", err);
-            }
+            alert("Tanda tangan berhasil disimpan ke sistem.");
         }
     };
   
@@ -93,20 +76,56 @@ function ValidasiRevisiContent() {
 
     useEffect(() => {
         const fetchData = async () => {
-            if (!formattedNop || formattedNop.length < 18) return;
+            if (!rawNop || rawNop.length !== 18) return;
             try {
                 const userData = await getCurrentUser();
                 setUser(userData);
 
-                const nopObj = parseStringToNop(formattedNop);
-                const detailData = await fetchDetailProperti(nopObj).catch(() => null);
+                let localData: any = null;
+                if (typeof window !== 'undefined') {
+                    const stored = localStorage.getItem(`property-detail-${rawNop}`);
+                    if (stored) {
+                        try {
+                            localData = JSON.parse(stored);
+                        } catch (e) {
+                            console.error("Failed to parse stored property data", e);
+                        }
+                    }
+                }
+
+                let detailData = null;
+                let totalLuas = 0;
+
+                if (localData && localData.nop === rawNop && localData.nilaiSistemBumi) {
+                    detailData = {
+                        jalanOp: localData.jalanOp,
+                        luasBumi: localData.luasBumi,
+                        nilaiSistemBumi: localData.nilaiSistemBumi,
+                        jnsBumi: localData.jnsBumi
+                    };
+                    totalLuas = localData.totalLuasBangunan || 0;
+                } else {
+                    const nopObj = parseStringToNop(formattedNop);
+                    const [apiDetail, apiBangunan] = await Promise.all([
+                        fetchDetailProperti(nopObj).catch((err) => {
+                            console.error("Error API Detail:", err);
+                            return null;
+                        }),
+                        fetchListBangunan(nopObj).catch(() => ([] as any))
+                    ]);
+                    detailData = apiDetail;
+                    const bngList = Array.isArray(apiBangunan) ? apiBangunan : ((apiBangunan as any)?.rows || []);
+                    totalLuas = bngList.reduce((acc: number, cur: any) => acc + (cur.luasBng || 0), 0);
+                }
+
                 setDetailProperti(detailData);
+                setLuasBangunanTotal(totalLuas);
             } catch (error) {
                 console.error("Gagal menarik data:", error);
             }
         };
         fetchData();
-    }, [formattedNop]);
+    }, [rawNop, formattedNop]);
 
     return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc]">
@@ -266,16 +285,23 @@ function ValidasiRevisiContent() {
 
                         const { error } = await supabase
                             .from('decisions')
-                            .update({
+                            .insert({
+                                nop: rawNop,
                                 status_keputusan: 'Revisi',
                                 user_id: user?.id,
                                 nilai_njop_lama: detailProperti?.nilaiSistemBumi || 0,
                                 nilai_njop_final: nilaiFinalAngka,
+                                ttd_url: ttdPenilai,
                                 detail_keputusan: {
-                                    catatan_penilai: alasan
+                                    catatan_penilai: alasan,
+                                    alamat: detailProperti?.jalanOp || "Alamat tidak tersedia",
+                                    luas_tanah: detailProperti?.luasBumi || 0,
+                                    luas_bangunan: luasBangunanTotal,
+                                    nilai_estimasi_njop: detailProperti?.nilaiSistemBumi || 0,
+                                    njop_per_m2: detailProperti?.luasBumi ? Math.round(nilaiFinalAngka / detailProperti.luasBumi) : 0,
+                                    zonasi: detailProperti?.jnsBumi === '1' ? 'Perumahan' : (detailProperti?.jnsBumi === '2' ? 'Komersial' : 'Lainnya')
                                 }
-                            })
-                            .eq('nop', rawNop);
+                            });
 
                         if (error) throw error;
 
