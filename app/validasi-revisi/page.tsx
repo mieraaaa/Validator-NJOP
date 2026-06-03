@@ -4,17 +4,19 @@ import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft, CircleCheck, CircleX, FileText, PencilLine, SendHorizontal } from 'lucide-react';
 
-import { useRef, useState, Suspense } from 'react';
+import { useRef, useState, Suspense, useEffect } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { supabase } from '@/lib/supabase';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { fetchDetailProperti, parseStringToNop } from "@/lib/api";
+import { getCurrentUser } from '@/lib/auth';
 
 function ValidasiRevisiContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const nopProperti = searchParams.get('nop') || '317104000301200510';
     const rawNop = nopProperti ? nopProperti.replace(/\D/g, '') : '';
-    
+  
     const storageKey = (field: string) => `validasi-revisi-${field}-${rawNop}`;
 
     const [ttdPenilai, setTtdPenilai] = useState<string | null>(() => {
@@ -36,6 +38,12 @@ function ValidasiRevisiContent() {
         return '';
     });
     const sigCanvas = useRef<SignatureCanvas>(null);
+
+    const formattedNop = rawNop.length === 18 ? (
+        `${rawNop.substring(0, 2)}.${rawNop.substring(2, 4)}.${rawNop.substring(4, 7)}.${rawNop.substring(7, 10)}.${rawNop.substring(10, 13)}-${rawNop.substring(13, 17)}.${rawNop.substring(17, 18)}`
+    ) : nopProperti;
+
+    const [detailProperti, setDetailProperti] = useState<any>(null);
 
     const isFormValid = ttdPenilai !== null && nilaiNjop.trim() !== '' && alasan.trim() !== '';
 
@@ -81,6 +89,25 @@ function ValidasiRevisiContent() {
         }
     };
   
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!formattedNop || formattedNop.length < 18) return;
+            try {
+                const userData = await getCurrentUser();
+                setUser(userData);
+
+                const nopObj = parseStringToNop(formattedNop);
+                const detailData = await fetchDetailProperti(nopObj).catch(() => null);
+                setDetailProperti(detailData);
+            } catch (error) {
+                console.error("Gagal menarik data:", error);
+            }
+        };
+        fetchData();
+    }, [formattedNop]);
+
     return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc]">
 
@@ -224,16 +251,46 @@ function ValidasiRevisiContent() {
         <hr className="border-[#C5C5D3] w-full mx-auto mt-8 mb-4"/>
         {/* Tombol Bawah */}
         <div className="w-full flex flex-col gap-4">
-            {/* Preview Draf Berita Acara */}
-            <Link href={`/berita-revisi?nop=${rawNop || nopProperti}`} className="w-full border border-[#757682] rounded-lg flex justify-center items-center gap-2 text-[#1A1B21] py-3">
-                <FileText className="flex size-5 shrink-0"/>
-                <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
-            </Link>
-{/* Konfirmasi & Kirim */}
+             {/* Preview Draf Berita Acara */}
+             <Link href={`/berita-revisi?nop=${rawNop || nopProperti}&nilaiNjopBaru=${nilaiNjop}`} className="w-full border border-[#757682] rounded-lg flex justify-center items-center gap-2 text-[#1A1B21] py-3">
+                 <FileText className="flex size-5 shrink-0"/>
+                 <span className="font-mono font-semibold text-[16px]">Preview Draf Berita Acara</span>
+             </Link>
+            {/* Konfirmasi & Kirim */}
             <button 
-                onClick={() => {
+                onClick={async () => {
                     if (!isFormValid) return;
-                    router.push(`/validasi-berhasil-revisi?nop=${rawNop || nopProperti}`);
+                    
+                    try {
+                        const nilaiFinalAngka = parseInt(nilaiNjop.replace(/\D/g, ''), 10) || 0;
+
+                        const { error } = await supabase
+                            .from('decisions')
+                            .update({
+                                status_keputusan: 'Revisi',
+                                user_id: user?.id,
+                                nilai_njop_lama: detailProperti?.nilaiSistemBumi || 0,
+                                nilai_njop_final: nilaiFinalAngka,
+                                detail_keputusan: {
+                                    catatan_penilai: alasan
+                                }
+                            })
+                            .eq('nop', rawNop);
+
+                        if (error) throw error;
+
+                        if (typeof window !== 'undefined') {
+                            window.localStorage.removeItem(storageKey('nilaiNjop'));
+                            window.localStorage.removeItem(storageKey('alasan'));
+                            window.localStorage.removeItem(storageKey('ttd'));
+                        }
+
+                        router.push(`/validasi-berhasil-revisi?nop=${rawNop || nopProperti}`);
+
+                    } catch (error: any) {
+                        console.error("Gagal mengirim detail keputusan:", error.message);
+                        alert("Gagal mengirim data final ke server. Silakan coba lagi.");
+                    }
                 }}
                 disabled={!isFormValid}
                 className={`w-full rounded-lg flex justify-center items-center gap-2 py-3 transition-opacity ${
@@ -243,7 +300,7 @@ function ValidasiRevisiContent() {
                 }`}
             >
                 <span className="font-mono font-semibold text-[16px]">Konfirmasi & Kirim</span>
-                <SendHorizontal className="flex size-5 shrink-0"/>
+                <SendHorizontal className="flex size-6 shrink-0"/>
             </button>
         </div>
         <div className="w-full bg-[#EEEDF4] rounded-sm flex justify-between items-start text-start gap-2 my-5 px-3 py-3">

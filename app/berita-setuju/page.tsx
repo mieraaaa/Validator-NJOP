@@ -1,8 +1,80 @@
+"use client";
+
 import Image from "next/image";
 import Link from 'next/link';
 import { ArrowLeft, CircleCheck } from 'lucide-react';
+import { getCurrentUser } from '@/lib/auth';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { fetchDetailProperti, fetchListBangunan, parseStringToNop, formatNopToString } from "@/lib/api";
 
 export default function Home() {
+    const [user, setUser] = useState<any>(null);
+    const [isLoadingUser, setIsLoadingUser] = useState(true);
+    const [detailProperti, setDetailProperti] = useState<any>(null);
+    const [bangunan, setBangunan] = useState<any>(null);
+    const [isLoadingData, setIsLoadingData] = useState(true);
+
+    const searchParams = useSearchParams();
+    const nopParam = searchParams.get('nop') || '';
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const userData = await getCurrentUser(); 
+                setUser(userData);
+            } catch (error) {
+                console.error("Gagal menarik data user:", error);
+            } finally {
+                setIsLoadingUser(false);
+            }
+        };
+        
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
+        if (!nopParam) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setIsLoadingData(false);
+            return;
+        }
+        async function loadData() {
+            try {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
+                setIsLoadingData(true);
+                const nopObj = parseStringToNop(nopParam);
+
+                // Fetch All API concurrently
+                const [detailData, bangunanData] = await Promise.all([
+                    fetchDetailProperti(nopObj),
+                    fetchListBangunan(nopObj).catch(() => []),
+                ]);
+
+                setDetailProperti(detailData);
+                setBangunan({ rows: Array.isArray(bangunanData) ? bangunanData : [] });
+            } finally {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
+                setIsLoadingData(false);
+            }
+        }
+        loadData();
+    }, [nopParam]);
+
+    const [tanggalHariIni, setTanggalHariIni] = useState<string>('Memuat tanggal...');
+
+    useEffect(() => {
+        const sekarang = new Date();
+        
+        const formatTanggal = sekarang.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+        
+        setTanggalHariIni(formatTanggal);
+    }, []);
+
   return (
     <main className="w-full max-w-md mx-auto min-h-screen relative overflow-x-hidden bg-[#f8fafc] pb-5">
 
@@ -38,19 +110,35 @@ export default function Home() {
         <div className="w-full border border-[#C5C5D3] bg-[#FAF8FF] flex flex-col gap-5 items-center py-4 px-4">
             <div className="w-full flex flex-col gap-1 font-mono">
                 <h4 className="font-bold text-[11px] text-[#444651]">Nomor Objek Pajak (NOP)</h4>
-                <span className="font-medium text-[14px] text-[#1A1B21] break-all">32.73.040.001.012-0043.0</span>
+                <span className="font-medium text-[14px] text-[#1A1B21] break-all">
+                    {isLoadingData ? 'Memuat...' : (detailProperti ? formatNopToString({
+                        kdPropinsi: detailProperti.kdPropinsi,
+                        kdDati2: detailProperti.kdDati2,
+                        kdKecamatan: detailProperti.kdKecamatan,
+                        kdKelurahan: detailProperti.kdKelurahan,
+                        kdBlok: detailProperti.kdBlok,
+                        noUrut: detailProperti.noUrut,
+                        kdJnsOp: detailProperti.kdJnsOp,
+                    }) : 'Data tidak tersedia')}
+                </span>
             </div>
             <div className="w-full flex flex-col gap-1">
                 <h4 className="font-mono font-bold text-[11px] text-[#444651]">Alamat Objek Pajak</h4>
-                <span className="font-public-sans text-[14px] text-[#1A1B21] leading-tight line-clamp-2">Jl. Merdeka Barat No. 14, RT 02 / RW 05, Kel. Sukamaju, Kec. Jatinegara</span>
+                <span className="font-public-sans text-[14px] text-[#1A1B21] leading-tight line-clamp-2">
+                    {isLoadingData ? 'Memuat...' : (detailProperti?.jalanOp || 'Alamat tidak tersedia')}
+                </span>
             </div>
             <div className="w-full flex flex-col gap-1 font-mono">
                 <h4 className="font-bold text-[11px] text-[#444651]">Luas Bumi (M²)</h4>
-                <span className="font-medium text-[14px] text-[#1A1B21]">450</span>
+                <span className="font-medium text-[14px] text-[#1A1B21]">
+                    {isLoadingData ? 'Memuat...' : (detailProperti?.luasBumi || 0)}
+                </span>
             </div>
             <div className="w-full flex flex-col gap-1 font-mono">
                 <h4 className="font-bold text-[11px] text-[#444651]">Luas Bangunan (M²)</h4>
-                <span className="font-medium text-[14px] text-[#1A1B21]">210</span>
+                  <span className="font-medium text-[14px] text-[#1A1B21]">
+                      {isLoadingData ? 'Memuat...' : (bangunan ? bangunan.rows.reduce((acc: number, curr: any) => acc + (curr.luasBng || 0), 0) : 0)}
+                  </span>
             </div>
         </div>
         {/* Hasil Validasi NJOP */}
@@ -66,9 +154,21 @@ export default function Home() {
                 <h4 className="font-public-sans text-[14px] text-[#264191]">Nilai Jual Objek Pajak (NJOP) 
                     <span className="block">Ditetapkan</span>
                 </h4>
-                <span className="font-mono font-bold text-[24px] text-[#00164E]">Rp 1.450.000.000</span>
+                <span className="font-mono font-bold text-[24px] text-[#00164E] flex flex-col items-center gap-1">
+                    {isLoadingData ? (
+                        <>
+                            <span className="text-[13px] line-through">Rp ...</span>
+                            <span>Rp ...</span>
+                        </>
+                    ) : (
+                        <>
+                            {/* For approved, we show the NJOP without line-through */}
+                            <span className="text-[13px]">Rp {detailProperti?.nilaiSistemBumi?.toLocaleString('id-ID')}</span>
+                        </>
+                    )}
+                </span>
                 <p className="font-public-sans text-[12px] text-[#264191]">
-                    Berdasarkan hasil peninjauan lapangan pada tanggal 24 Oktober 2023, data fisik dan nilai 
+                    Berdasarkan hasil peninjauan lapangan pada tanggal {tanggalHariIni}, data fisik dan nilai 
                     bangunan telah sesuai dengan kondisi faktual.
                 </p>
             </div>
@@ -103,8 +203,8 @@ export default function Home() {
                     />
                 </div>
                 <hr className="border-[#444651] w-[70%] mx-auto border-t pb-1"/>
-                <span className="font-mono font-semibold text-[16px]">Ahmad Hidayat</span>
-                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">NIP. 199203152019021001</span>
+                <span className="font-mono font-semibold text-[16px]">{isLoadingUser ? 'Memuat Nama...' : (user?.nama || 'Ahmad Hidayat')}</span>
+                <span className="font-mono font-medium text-[14px] text-[#444651] break-all">{isLoadingUser ? 'Memuat NIP...' : (user?.nip ? `NIP. ${user.nip}` : 'NIP. 199203152019021001')}</span>
             </div>
         </div>
       </div>
